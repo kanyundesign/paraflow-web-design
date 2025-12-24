@@ -107,7 +107,7 @@ export default function Footer() {
             </p>
             
             {/* 社交媒体链接 - 移到这里 */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 mb-20">
               {socialLinks.map((social, index) => (
                 <a
                   key={index}
@@ -119,6 +119,11 @@ export default function Footer() {
                 </a>
               ))}
             </div>
+            
+            {/* 版权信息 */}
+            <p className="text-gray-600 text-xs">
+              © 2024 Paraflow Inc. All rights reserved.
+            </p>
           </div>
 
           {/* 链接组 */}
@@ -127,14 +132,6 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* 底部栏 */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-white/5">
-          {/* 版权信息 */}
-          <p className="text-gray-600 text-xs">
-            © 2024 Paraflow Inc. All rights reserved.
-          </p>
-
-        </div>
 
         {/* 大型品牌文字 */}
         <div className="mt-16 -mb-4 overflow-hidden flex justify-center">
