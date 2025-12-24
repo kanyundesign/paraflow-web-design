@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom font imports - 使用更优雅的衬线字体 */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Paraflow 品牌色 */
+  --paraflow-green: #00C05C;
+  --paraflow-green-light: #79F200;
+  --paraflow-black: #0A0A0A;
+  --paraflow-gray-dark: #1A1A1A;
+  --paraflow-gray-medium: #2A2A2A;
+  --paraflow-gray-light: #888888;
+  
+  /* 渐变 */
+  --paraflow-gradient: linear-gradient(135deg, #00C05C 0%, #79F200 100%);
+}
+
+/* 基础样式 */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paraflow-black);
+  color: #ffffff;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* 人文衬线字体用于标题 - Playfair Display */
+.font-display {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-feature-settings: 'liga' 1, 'kern' 1;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--paraflow-gray-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--paraflow-gray-medium);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--paraflow-gray-light);
+}
+
+/* 链接默认样式 */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 按钮基础样式 */
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* 绿色渐变文字 */
+.text-gradient {
+  background: var(--paraflow-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 绿色光晕效果 */
+.glow-green {
+  box-shadow: 0 0 20px rgba(0, 192, 92, 0.3),
+              0 0 40px rgba(0, 192, 92, 0.2),
+              0 0 60px rgba(0, 192, 92, 0.1);
+}
+
+/* 卡片悬停效果 */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px rgba(0, 192, 92, 0.15);
+}
+
+/* 动画延迟工具类 */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* 页面过渡动画 */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* 顶部标签 - 边框渐变旋转效果 */
+.tag-border-rotate {
+  position: relative;
+  background: transparent;
+  border: none !important;
+  padding: 2px;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.tag-border-rotate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 192, 92, 0.3);
+  border-radius: 9999px;
+  z-index: 0;
+}
+
+.tag-border-rotate::after {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    rgba(255,255,255,0.8) 20deg,
+    transparent 40deg,
+    transparent 180deg,
+    rgba(255,255,255,0.8) 200deg,
+    transparent 220deg,
+    transparent 360deg
+  );
+  opacity: 0;
+  animation: tag-spin 3s linear infinite;
+  animation-play-state: paused;
+  z-index: 1;
+  transition: opacity 0.2s ease;
+}
+
+.tag-border-rotate:hover::after {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+.tag-border-rotate .tag-inner {
+  position: relative;
+  z-index: 2;
+  background: #0A0A0A;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.875rem;
+}
+
+@keyframes tag-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 页面滚动动画基础类 */
+.scroll-fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 响应减少动画的用户偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 强调文字闪烁效果 */
+@keyframes text-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--paraflow-green) 0%,
+    var(--paraflow-green-light) 25%,
+    #ffffff 50%,
+    var(--paraflow-green-light) 75%,
+    var(--paraflow-green) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: text-shimmer 3s linear infinite;
+}
+
+/* 脉冲光圈效果 */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(0.95); opacity: 1; }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* 星空背景动画 */
+@keyframes star-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+}

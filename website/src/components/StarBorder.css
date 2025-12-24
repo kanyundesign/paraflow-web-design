@@ -1,0 +1,138 @@
+.star-border-container {
+  display: inline-block;
+  position: relative;
+  border-radius: 10px;
+  padding: 2px;
+  overflow: hidden;
+  background: #00C05C;
+}
+
+/* 光点1 - 顺时针旋转 */
+.border-gradient-bottom {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 30%, rgba(255,255,255,0.4) 60%, transparent 80%);
+  animation: move-clockwise 6s linear infinite;
+  animation-play-state: paused;
+  z-index: 0;
+  filter: blur(3px);
+  transition: opacity 0.2s ease;
+}
+
+/* 光点2 - 逆时针旋转 */
+.border-gradient-top {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8) 30%, rgba(255,255,255,0.4) 60%, transparent 80%);
+  animation: move-counter-clockwise 6s linear infinite;
+  animation-play-state: paused;
+  z-index: 0;
+  filter: blur(3px);
+  transition: opacity 0.2s ease;
+}
+
+/* Hover 状态激活动画 */
+.star-border-container:hover .border-gradient-bottom,
+.star-border-container:hover .border-gradient-top {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+.inner-content {
+  position: relative;
+  border: none;
+  background: #00C05C;
+  color: black;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  padding: 10px 20px;
+  border-radius: 8px;
+  z-index: 1;
+}
+
+/* 顺时针：左上角开始，沿边缘移动 */
+@keyframes move-clockwise {
+  0% {
+    top: -25px;
+    left: -25px;
+  }
+  15% {
+    top: -25px;
+    left: calc(50% - 30px);
+  }
+  30% {
+    top: -25px;
+    left: calc(100% - 35px);
+  }
+  45% {
+    top: calc(50% - 30px);
+    left: calc(100% - 35px);
+  }
+  55% {
+    top: calc(100% - 35px);
+    left: calc(100% - 35px);
+  }
+  70% {
+    top: calc(100% - 35px);
+    left: calc(50% - 30px);
+  }
+  85% {
+    top: calc(100% - 35px);
+    left: -25px;
+  }
+  92% {
+    top: calc(50% - 30px);
+    left: -25px;
+  }
+  100% {
+    top: -25px;
+    left: -25px;
+  }
+}
+
+/* 逆时针：右下角开始，沿边缘移动 */
+@keyframes move-counter-clockwise {
+  0% {
+    bottom: -25px;
+    right: -25px;
+  }
+  15% {
+    bottom: -25px;
+    right: calc(50% - 30px);
+  }
+  30% {
+    bottom: -25px;
+    right: calc(100% - 35px);
+  }
+  45% {
+    bottom: calc(50% - 30px);
+    right: calc(100% - 35px);
+  }
+  55% {
+    bottom: calc(100% - 35px);
+    right: calc(100% - 35px);
+  }
+  70% {
+    bottom: calc(100% - 35px);
+    right: calc(50% - 30px);
+  }
+  85% {
+    bottom: calc(100% - 35px);
+    right: -25px;
+  }
+  92% {
+    bottom: calc(50% - 30px);
+    right: -25px;
+  }
+  100% {
+    bottom: -25px;
+    right: -25px;
+  }
+}
