@@ -6,7 +6,6 @@ import { ArrowRight } from "lucide-react";
 export default function CTA() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -16,12 +15,10 @@ export default function CTA() {
           setIsVisible(true);
           // 当进入视口时播放视频
           if (videoRef.current) {
-            videoRef.current.playbackRate = 0.6;
-            videoRef.current.play().catch(() => {});
-          }
-          if (mobileVideoRef.current) {
-            mobileVideoRef.current.playbackRate = 0.6;
-            mobileVideoRef.current.play().catch(() => {});
+            videoRef.current.playbackRate = 0.6; // 缓慢播放（0.6倍速）
+            videoRef.current.play().catch(() => {
+              // 忽略自动播放错误
+            });
           }
         }
       },
@@ -51,25 +48,22 @@ export default function CTA() {
         className="md:hidden absolute z-0 inset-0 overflow-hidden"
       >
         <video
-          ref={mobileVideoRef}
           className="absolute inset-0 w-full h-full object-cover"
           src="/cosmic-bg.mp4"
           muted
           playsInline
           autoPlay
           loop
-          preload="metadata"
-          poster=""
+          preload="auto"
           style={{
             opacity: 0.5,
             minWidth: '100%',
             minHeight: '100%',
-            objectFit: 'cover',
           }}
         />
         {/* 上下渐变遮罩 */}
         <div 
-          className="absolute inset-0 pointer-events-none"
+          className="absolute inset-0"
           style={{
             background: "linear-gradient(to bottom, black 0%, transparent 20%, transparent 80%, black 100%)",
           }}
