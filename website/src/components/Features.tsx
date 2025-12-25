@@ -314,8 +314,8 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
       <div className={`relative px-6 lg:px-8 transition-all duration-500 ${
           isExpanded ? "py-6" : "py-8"
         }`}>
-        {/* 左侧竖向装饰线 - 在数字与图标的居中位置 */}
-        <div className="absolute left-[71px] lg:left-[79px] top-0 bottom-0 w-px bg-white/40" />
+        {/* 左侧竖向装饰线 - 在数字与图标的居中位置（移动端隐藏） */}
+        <div className="hidden md:block absolute left-[71px] lg:left-[79px] top-0 bottom-0 w-px bg-white/40" />
         
         {/* 中间竖向装饰线 - 在左右两列之间 */}
         <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-white/40" />
@@ -340,10 +340,10 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
           {/* 左侧：标题 + 描述 + 标签 */}
           <div>
             {/* 标题行 */}
-            <div className={`flex items-start gap-6 transition-all duration-500 ${
-              isExpanded ? "-mt-[60px] mb-12" : "mt-0 mb-0"
+            <div className={`flex items-start gap-4 md:gap-6 transition-all duration-500 ${
+              isExpanded ? "mt-0 md:-mt-[60px] mb-6 md:mb-12" : "mt-0 mb-0"
             }`}>
-              <span className={`font-mono text-2xl md:text-3xl transition-colors duration-500 ${
+              <span className={`font-mono text-lg sm:text-xl md:text-2xl lg:text-3xl transition-colors duration-500 ${
                 isExpanded 
                   ? index === 0 ? "text-paraflow-green" : index === 1 ? "text-purple-400" : index === 2 ? "text-blue-400" : "text-rose-400"
                   : "text-gray-700"
@@ -351,7 +351,7 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
                 {String(index + 1).padStart(2, "0")}
               </span>
               
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
+              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
                 isExpanded 
                   ? index === 0 
                     ? "bg-paraflow-green/20 border border-paraflow-green/30" 
@@ -371,7 +371,7 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
                 {module.icon}
               </div>
               
-              <h3 className={`font-display text-[26px] md:text-[30px] lg:text-[36px] transition-colors duration-500 leading-tight ${
+              <h3 className={`font-display text-[20px] sm:text-[24px] md:text-[30px] lg:text-[36px] transition-colors duration-500 leading-tight ${
                 isExpanded ? "text-white" : "text-gray-600"
               }`}>
                 {module.title.includes('\n') ? (
@@ -535,13 +535,21 @@ export default function Features() {
     activeIndexRef.current = activeIndex;
   }, [activeIndex]);
 
-  // 滚动到指定模块
+  // 滚动到指定模块（使模块内容在视口中间偏上位置）
   const scrollToModule = (index: number) => {
     const targetRef = triggerRefs.current[index];
     if (targetRef) {
-      const offsetTop = targetRef.offsetTop - 60;
+      // 使用 offsetTop 获取元素相对于文档的绝对位置
+      const sectionEl = sectionRef.current;
+      if (!sectionEl) return;
+      
+      const sectionTop = sectionEl.offsetTop;
+      const moduleOffsetTop = targetRef.offsetTop;
+      // 将模块头部定位到视口顶部偏下 80px 的位置（导航栏高度 + 一点间距）
+      const targetPosition = sectionTop + moduleOffsetTop - 80;
+      
       window.scrollTo({
-        top: offsetTop,
+        top: Math.max(0, targetPosition),
         behavior: 'smooth'
       });
     }
@@ -560,16 +568,42 @@ export default function Features() {
     
     isAnimatingRef.current = true;
     setActiveIndex(newIndex);
-    scrollToModule(newIndex);
     
-    // 动画完成后解锁
+    // 延迟执行滚动，让模块完全展开后再定位（增加到 300ms）
+    setTimeout(() => {
+      const targetRef = triggerRefs.current[newIndex];
+      if (targetRef) {
+        // 直接使用 getBoundingClientRect 获取当前位置
+        const rect = targetRef.getBoundingClientRect();
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        // 向下滑动：定位到距离视口顶部 250px（100 + 150）
+        // 向上滑动：定位到距离视口顶部 100px
+        // 02、03、04 模块向下滑动时额外偏移 100px
+        let offset = direction === 'next' ? 250 : 100;
+        if (direction === 'next' && (newIndex === 1 || newIndex === 2 || newIndex === 3)) {
+          offset = 350; // 02、03、04 模块额外向下 100px
+        }
+        const targetPosition = scrollTop + rect.top - offset;
+        
+        window.scrollTo({
+          top: Math.max(0, targetPosition),
+          behavior: 'smooth'
+        });
+      }
+    }, 300);
+    
+    // 动画完成后解锁（1.5秒确保动画流畅完成）
     setTimeout(() => {
       isAnimatingRef.current = false;
-    }, 800);
+    }, 1500);
   };
 
   // 监听滚轮事件实现抽屉效果
   useEffect(() => {
+    let accumulatedDelta = 0;
+    const deltaThreshold = 150; // 需要累积的滚动量才触发切换
+    let lastWheelTime = 0;
+    
     const handleWheel = (e: WheelEvent) => {
       // 检查是否在 Features 区域内
       const sectionEl = sectionRef.current;
@@ -578,9 +612,17 @@ export default function Features() {
       const sectionRect = sectionEl.getBoundingClientRect();
       const isInSection = sectionRect.top <= 100 && sectionRect.bottom >= window.innerHeight * 0.5;
       
-      if (!isInSection) return;
+      if (!isInSection) {
+        accumulatedDelta = 0;
+        return;
+      }
       
-      // 判断是否需要拦截滚动
+      // 如果正在动画中，阻止滚动
+      if (isAnimatingRef.current) {
+        e.preventDefault();
+        return;
+      }
+      
       const currentIndex = activeIndexRef.current;
       const isAtFirst = currentIndex === 0;
       const isAtLast = currentIndex === 3;
@@ -589,30 +631,28 @@ export default function Features() {
       
       // 在第一个模块向上滚动，或最后一个模块向下滚动时，不拦截
       if ((isAtFirst && scrollingUp) || (isAtLast && scrollingDown)) {
+        accumulatedDelta = 0;
         return;
       }
       
-      // 检查当前模块是否完全在视口中
-      const currentRef = triggerRefs.current[currentIndex];
-      if (currentRef) {
-        const rect = currentRef.getBoundingClientRect();
-        // 如果当前模块底部还没到视口底部，且向下滚动，允许正常滚动查看内容
-        if (scrollingDown && rect.bottom > window.innerHeight + 50) {
-          return;
-        }
-        // 如果当前模块顶部还没到视口顶部，且向上滚动，允许正常滚动
-        if (scrollingUp && rect.top < -50) {
-          return;
-        }
-      }
-      
-      // 拦截滚动，切换模块
+      // 拦截滚动（在 Features 区域内始终拦截，通过 switchModule 控制切换）
       e.preventDefault();
       
-      if (scrollingDown) {
-        switchModule('next');
-      } else if (scrollingUp) {
-        switchModule('prev');
+      // 重置累积值如果间隔太长
+      const now = Date.now();
+      if (now - lastWheelTime > 500) {
+        accumulatedDelta = 0;
+      }
+      lastWheelTime = now;
+      
+      // 累积滚动量
+      accumulatedDelta += e.deltaY;
+      
+      // 检查是否达到阈值（增加到 200 防止过快切换）
+      if (Math.abs(accumulatedDelta) >= 200) {
+        const direction = accumulatedDelta > 0 ? 'next' : 'prev';
+        accumulatedDelta = 0;
+        switchModule(direction);
       }
     };
     
@@ -682,11 +722,21 @@ export default function Features() {
                 isExpanded={activeIndex === index}
                 onClick={() => {
                   setActiveIndex(index);
-                  // 点击时滚动到模块头部
-                  const targetRef = triggerRefs.current[index];
-                  if (targetRef) {
-                    targetRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
+                  // 点击时滚动到模块（使用与向下滑动相同的定位逻辑）
+                  setTimeout(() => {
+                    const targetRef = triggerRefs.current[index];
+                    if (targetRef) {
+                      const rect = targetRef.getBoundingClientRect();
+                      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                      // 01 模块：250px，02、03、04 模块：350px
+                      const offset = index === 0 ? 250 : 350;
+                      const targetPosition = scrollTop + rect.top - offset;
+                      window.scrollTo({
+                        top: Math.max(0, targetPosition),
+                        behavior: 'smooth'
+                      });
+                    }
+                  }, 300);
                 }}
               />
             </div>

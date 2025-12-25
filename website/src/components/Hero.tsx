@@ -234,15 +234,15 @@ export default function Hero() {
         <DoubleDiamondAscii />
       </div>
 
-      <div ref={contentRef} className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8 pt-40">
+      <div ref={contentRef} className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8 pt-24 md:pt-32 lg:pt-40">
         
         {/* 顶部标签 */}
-        <div className="flex justify-center mb-16">
+        <div className="flex justify-center mb-8 md:mb-12 lg:mb-16">
           <div className="group inline-flex items-center gap-2.5 px-3.5 py-2 bg-black border border-paraflow-green/30 rounded-full text-xs hover:border-paraflow-green/50 transition-colors cursor-pointer">
             {/* 热点 emoji */}
             <span className="text-sm">🔥</span>
-            <span className="text-paraflow-green font-medium tracking-wider">UPDATE:</span>
-            <span className="text-gray-300 tracking-wider">COPY TO FIGMA LIVE</span>
+            <span className="text-paraflow-green font-medium tracking-wider">What's New:</span>
+            <span className="text-gray-300 tracking-wider">Copy to Figma Live</span>
             <ArrowRight className="w-3 h-3 text-white group-hover:text-paraflow-green group-hover:translate-x-1 transition-all duration-300" />
           </div>
         </div>
@@ -261,13 +261,13 @@ export default function Hero() {
       </div>
 
       {/* 中间留白区域 */}
-      <div className="flex-1 min-h-[200px] md:min-h-[300px]" />
+      <div className="flex-1 min-h-[80px] sm:min-h-[120px] md:min-h-[200px] lg:min-h-[300px]" />
 
       {/* 底部内容区域 */}
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8">
 
         {/* 底部区域 */}
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-8 pb-16">
+        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 md:gap-8 pb-8 md:pb-12 lg:pb-16">
           {/* 左侧描述 */}
           <p className="text-gray-400 text-lg max-w-md leading-relaxed">
             Vibe coding, with product definition and<br />

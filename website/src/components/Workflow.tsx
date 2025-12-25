@@ -87,14 +87,34 @@ export default function Workflow() {
     return () => clearInterval(interval);
   }, [isVisible, isPaused, steps.length, direction]);
 
-  // 处理用户点击 - 暂停自动切换，5秒后恢复
-  const handleCardClick = (index: number) => {
-    setActiveIndex(index);
+  // 处理用户点击 - 逐步过渡动画（2倍速经过中间卡片）
+  const handleCardClick = (targetIndex: number) => {
+    if (targetIndex === activeIndex) return;
+    
     setIsPaused(true);
     
     // 清除之前的定时器
     if (pauseTimeoutRef.current) {
       clearTimeout(pauseTimeoutRef.current);
+    }
+    
+    const diff = targetIndex - activeIndex;
+    const step = diff > 0 ? 1 : -1;
+    const stepsCount = Math.abs(diff);
+    
+    // 如果距离超过1，逐步过渡（2倍速：600ms 间隔，能看到中间卡片的过渡）
+    if (stepsCount > 1) {
+      let currentStep = 0;
+      const animateStep = () => {
+        currentStep++;
+        setActiveIndex(prev => prev + step);
+        if (currentStep < stepsCount) {
+          setTimeout(animateStep, 600); // 2倍速：600ms 间隔，让动画顺滑可见
+        }
+      };
+      animateStep();
+    } else {
+      setActiveIndex(targetIndex);
     }
     
     // 5秒后恢复自动切换
@@ -170,7 +190,7 @@ export default function Workflow() {
         <div className="absolute z-20 left-[18%] top-[221px] -translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
         
         {/* 右侧竖向装饰线 */}
-        <div className="absolute z-20 right-[18%] -top-[79px] h-[300px] w-px bg-white/40" />
+        <div className="absolute z-20 right-[18%] -top-[76px] h-[300px] w-px bg-white/40" />
         {/* 右上角正方形 */}
         <div className="absolute z-20 right-[18%] -top-[77px] translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
 
@@ -190,10 +210,10 @@ export default function Workflow() {
         
         {/* 横向装饰线 - 通栏（无动画） */}
         <div 
-          className="absolute left-1/2 -translate-x-1/2 h-[0.5px] top-[224px]"
+          className="absolute left-1/2 -translate-x-1/2 h-px top-[224px]"
             style={{
               width: '100vw',
-              background: "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 15%, rgba(255, 255, 255, 0.3) 30%, rgba(255, 255, 255, 0.5) 45%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.5) 55%, rgba(255, 255, 255, 0.3) 70%, rgba(255, 255, 255, 0.1) 85%, transparent 100%)"
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 15%, rgba(255,255,255,0.4) 85%, transparent 100%)'
             }}
           />
 

@@ -108,11 +108,11 @@ export default function Audience() {
 
   return (
     <section ref={sectionRef} className="relative bg-black py-32 -mt-[30px] overflow-hidden">
-      {/* 顶部横向装饰线 - 炫彩渐变 */}
+      {/* 顶部横向装饰线 */}
       <div 
-        className="absolute top-0 left-0 right-0 h-[0.5px]"
+        className="absolute top-0 left-0 right-0 h-px"
         style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 15%, rgba(255, 255, 255, 0.3) 30%, rgba(255, 255, 255, 0.5) 45%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.5) 55%, rgba(255, 255, 255, 0.3) 70%, rgba(255, 255, 255, 0.1) 85%, transparent 100%)",
+          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 15%, rgba(255,255,255,0.4) 85%, transparent 100%)',
         }}
       />
       
