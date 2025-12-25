@@ -19,9 +19,9 @@ function FeatureCard({ title, description, tag, image, imageScale = 100, imageOf
   const scaleValue = imageScale / 100;
   
   return (
-    <div className="group relative bg-black border border-white/40 rounded-xl lg:rounded-2xl overflow-hidden hover:border-paraflow-green transition-all duration-500 cursor-pointer">
-      {/* 配图 - 小屏缩小高度 */}
-      <div className="aspect-[16/10] lg:aspect-video bg-gradient-to-br from-paraflow-green/5 via-black to-paraflow-green-light/5 overflow-hidden">
+    <div className="group relative bg-black border border-white/40 rounded-2xl overflow-hidden hover:border-paraflow-green transition-all duration-500 cursor-pointer">
+      {/* 配图 */}
+      <div className="aspect-video bg-gradient-to-br from-paraflow-green/5 via-black to-paraflow-green-light/5 overflow-hidden">
         {image ? (
           <img 
             src={image} 
@@ -34,26 +34,26 @@ function FeatureCard({ title, description, tag, image, imageScale = 100, imageOf
         )}
       </div>
       
-      {/* 内容区域 - 小屏缩小间距 */}
-      <div className="relative bg-black transition-transform duration-500 ease-out group-hover:-translate-y-8 lg:group-hover:-translate-y-10">
+      {/* 内容区域 */}
+      <div className="relative bg-black transition-transform duration-500 ease-out group-hover:-translate-y-10">
         <div className="border-t border-white/40" />
         
-        <div className="px-2 lg:px-4 pt-2 lg:pt-3 pb-1 lg:pb-2">
-          <div className="inline-flex items-center px-1.5 lg:px-2 py-0.5 bg-white/5 border border-white/20 rounded-full text-[8px] lg:text-[10px] text-white font-medium tracking-wider mb-2 lg:mb-3 group-hover:bg-paraflow-green/10 group-hover:border-paraflow-green/30 group-hover:text-paraflow-green transition-all duration-300">
+        <div className="px-4 pt-3 pb-2">
+          <div className="inline-flex items-center px-2 py-0.5 bg-white/5 border border-white/20 rounded-full text-[10px] text-white font-medium tracking-wider mb-3 group-hover:bg-paraflow-green/10 group-hover:border-paraflow-green/30 group-hover:text-paraflow-green transition-all duration-300">
             {tag}
           </div>
-          <h4 className="text-white text-xs lg:text-sm font-medium group-hover:text-paraflow-green transition-colors duration-300 line-clamp-1">
+          <h4 className="text-white text-sm font-medium group-hover:text-paraflow-green transition-colors duration-300">
             {title}
           </h4>
           
-          <p className="text-gray-400 text-[10px] lg:text-xs leading-relaxed mt-2 lg:mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 line-clamp-2">
+          <p className="text-gray-400 text-xs leading-relaxed mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 line-clamp-2">
             {description}
           </p>
         </div>
       </div>
       
-      <div className="absolute top-2 right-2 lg:top-4 lg:right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <ArrowUpRight className="w-3 h-3 lg:w-4 lg:h-4 text-paraflow-green" />
+      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <ArrowUpRight className="w-4 h-4 text-paraflow-green" />
       </div>
     </div>
   );
@@ -255,18 +255,18 @@ export default function Features() {
                     />
                   )}
                   
-                  <div className={`px-4 lg:px-8 py-16 lg:py-32 min-h-[60vh] lg:min-h-[80vh] flex flex-col justify-center transition-opacity duration-500 ${
+                  <div className={`px-8 py-32 min-h-[80vh] flex flex-col justify-center transition-opacity duration-500 ${
                     activeIndex === index ? 'opacity-100' : 'opacity-40'
                   }`}>
                     {/* 序号 + 图标 + 标题 */}
-                    <div className="flex items-start gap-3 lg:gap-6 mb-4 lg:mb-8">
-                      <span className={`font-mono text-2xl lg:text-4xl transition-colors duration-500 ${
+                    <div className="flex items-start gap-6 mb-8">
+                      <span className={`font-mono text-4xl transition-colors duration-500 ${
                         activeIndex === index ? module.colorClass : "text-gray-700"
                       }`}>
                         {String(index + 1).padStart(2, "0")}
                       </span>
                       
-                      <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
                         activeIndex === index 
                           ? index === 0 
                             ? "bg-paraflow-green/20 border border-paraflow-green/30" 
@@ -280,7 +280,7 @@ export default function Features() {
                         {module.icon}
                       </div>
                       
-                      <h3 className={`font-display text-xl lg:text-[42px] leading-tight transition-colors duration-500 ${
+                      <h3 className={`font-display text-[42px] leading-tight transition-colors duration-500 ${
                         activeIndex === index ? "text-white" : "text-gray-600"
                       }`}>
                         {module.title.includes('\n') ? (
@@ -296,25 +296,25 @@ export default function Features() {
                     </div>
 
                     {/* 描述文案 */}
-                    <div className="ml-0 lg:ml-[104px]">
-                      <p className={`text-white/40 text-sm lg:text-lg leading-relaxed mb-4 lg:mb-8 max-w-lg transition-all duration-500 ${
+                    <div className="ml-[104px]">
+                      <p className={`text-white/40 text-lg leading-relaxed mb-8 max-w-lg transition-all duration-500 ${
                         activeIndex === index ? "opacity-100" : "opacity-50"
                       }`}>
                         {module.description}
                       </p>
                       
                       {/* 标签 */}
-                      <div className="flex flex-wrap gap-2 lg:gap-3">
+                      <div className="flex flex-wrap gap-3">
                         {module.features.map((feature, i) => (
                           <span 
                             key={i}
-                            className={`inline-flex items-center gap-1.5 lg:gap-2 px-2 lg:px-4 py-1 lg:py-2 border rounded-full text-xs lg:text-sm transition-all duration-500 ${
+                            className={`inline-flex items-center gap-2 px-4 py-2 border rounded-full text-sm transition-all duration-500 ${
                               activeIndex === index 
                                 ? "border-white/30 text-white/50" 
                                 : "border-white/10 text-white/20"
                             }`}
                           >
-                            <span className={`w-1 h-1 lg:w-1.5 lg:h-1.5 rounded-full ${
+                            <span className={`w-1.5 h-1.5 rounded-full ${
                               index === 0 ? "bg-paraflow-green" : 
                               index === 1 ? "bg-purple-400" : 
                               index === 2 ? "bg-blue-400" : 
@@ -335,15 +335,15 @@ export default function Features() {
               {/* 右侧竖向装饰线 */}
               <div className="absolute right-[18%] top-0 bottom-0 w-px bg-white/40" />
               
-              {/* Sticky 容器 - 小屏调整 top 和高度 */}
-              <div className="sticky top-16 lg:top-24 h-[calc(100vh-4rem)] lg:h-[calc(100vh-6rem)] flex items-center px-4 lg:px-8">
+              {/* Sticky 容器 */}
+              <div className="sticky top-24 h-[calc(100vh-6rem)] flex items-center px-8">
                 <div className="w-full">
-                  {/* 卡片网格 - 带切换动画，小屏缩小间距 */}
+                  {/* 卡片网格 - 带切换动画 */}
                   <div className="relative">
                     {modules.map((module, moduleIndex) => (
                       <div 
                         key={moduleIndex}
-                        className={`grid grid-cols-2 gap-2 lg:gap-4 transition-all duration-700 ease-out ${
+                        className={`grid grid-cols-2 gap-4 transition-all duration-700 ease-out ${
                           activeIndex === moduleIndex 
                             ? 'opacity-100 translate-y-0 pointer-events-auto' 
                             : 'opacity-0 translate-y-8 pointer-events-none absolute inset-0'

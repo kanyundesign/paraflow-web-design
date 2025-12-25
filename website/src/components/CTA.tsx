@@ -43,17 +43,14 @@ export default function CTA() {
         }}
       />
       
-      {/* 背景视频容器 - 桌面端带右侧渐变遮罩 */}
+      {/* 背景视频容器 - 响应式定位 */}
       <div 
-        className="hidden md:block absolute z-0 left-[-800px] lg:left-[-1100px]"
+        className="absolute z-0 left-[-100px] md:left-[-800px] lg:left-[-1100px] right-[-100px] md:right-[-20%]"
         style={{
           top: "-20%",
-          right: "-20%",
           bottom: "-20%",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 95%, transparent 100%), linear-gradient(to right, black 0%, black 60%, transparent 90%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 95%, transparent 100%), linear-gradient(to right, black 0%, black 60%, transparent 90%)",
-          maskComposite: "intersect",
-          WebkitMaskComposite: "source-in",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
         }}
       >
         <video
@@ -62,32 +59,8 @@ export default function CTA() {
           src="/cosmic-bg.mp4"
           muted
           playsInline
-          preload="auto"
-          style={{
-            transform: "scale(0.6)",
-            transformOrigin: "center center",
-            mixBlendMode: "multiply",
-            opacity: 0.5,
-          }}
-        />
-      </div>
-
-      {/* 背景视频容器 - 移动端只有上下渐变遮罩，无右侧遮挡 */}
-      <div 
-        className="md:hidden absolute z-0 left-[-200px] right-[-50%]"
-        style={{
-          top: "-20%",
-          bottom: "-20%",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)",
-        }}
-      >
-        <video
-          className="w-full h-full object-cover"
-          src="/cosmic-bg.mp4"
-          muted
-          playsInline
           autoPlay
+          preload="auto"
           style={{
             transform: "scale(0.6)",
             transformOrigin: "center center",
