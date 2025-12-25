@@ -55,28 +55,18 @@ export default function CTA() {
       />
       
       {/* 背景视频容器 - 移动端 */}
-      <div 
-        className="md:hidden absolute z-0 inset-0 overflow-hidden"
-      >
+      <div className="md:hidden absolute inset-0 overflow-hidden">
         <video
           ref={mobileVideoRef}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="w-full h-full object-cover"
           src="/cosmic-bg.mp4"
           muted
           playsInline
           autoPlay
           loop
           preload="auto"
-          webkit-playsinline="true"
           style={{
-            opacity: 0.5,
-          }}
-        />
-        {/* 上下渐变遮罩 */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: "linear-gradient(to bottom, black 0%, transparent 20%, transparent 80%, black 100%)",
+            opacity: 0.6,
           }}
         />
       </div>
