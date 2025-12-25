@@ -96,11 +96,11 @@ export default function CTA() {
             background: "linear-gradient(to bottom, black 0%, transparent 15%, transparent 85%, black 100%)",
           }}
         />
-        {/* 右侧渐变遮罩 */}
+        {/* 右侧渐变遮罩 - 自然过渡 */}
         <div 
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(to right, transparent 0%, transparent 60%, black 100%)",
+            background: "linear-gradient(to right, transparent 0%, transparent 40%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.6) 75%, rgba(0,0,0,0.9) 90%, black 100%)",
           }}
         />
       </div>
