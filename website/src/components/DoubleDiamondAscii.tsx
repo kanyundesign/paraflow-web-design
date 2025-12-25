@@ -277,7 +277,12 @@ export default function DoubleDiamondAscii() {
       initParticles();
     });
 
+    // 检测是否为移动端（小于 768px）
+    const isMobile = () => window.innerWidth < 768;
+
     const handleMouseEnter = () => {
+      // 移动端禁用 hover 效果
+      if (isMobile()) return;
       isHoveringRef.current = true;
       hoverStartTime.current = Date.now();
     };
@@ -288,6 +293,14 @@ export default function DoubleDiamondAscii() {
 
     canvas.addEventListener("mouseenter", handleMouseEnter);
     canvas.addEventListener("mouseleave", handleMouseLeave);
+    
+    // 移动端也监听 touch 事件但不触发汇聚效果
+    canvas.addEventListener("touchstart", () => {
+      if (isMobile()) return;
+      isHoveringRef.current = true;
+      hoverStartTime.current = Date.now();
+    });
+    canvas.addEventListener("touchend", handleMouseLeave);
 
     let time = 0;
 
