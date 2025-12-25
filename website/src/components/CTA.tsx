@@ -43,9 +43,9 @@ export default function CTA() {
         }}
       />
       
-      {/* 背景视频容器 - 移动端居中显示 */}
+      {/* 背景视频容器 - 桌面端带右侧渐变遮罩 */}
       <div 
-        className="absolute z-0 flex items-center justify-center left-[-200px] md:left-[-800px] lg:left-[-1100px]"
+        className="hidden md:block absolute z-0 left-[-800px] lg:left-[-1100px]"
         style={{
           top: "-20%",
           right: "-20%",
@@ -64,12 +64,36 @@ export default function CTA() {
           playsInline
           preload="auto"
           style={{
-            transform: "scale(0.6)", // 缩小至 60%
+            transform: "scale(0.6)",
             transformOrigin: "center center",
-            mixBlendMode: "multiply", // 正片叠底
+            mixBlendMode: "multiply",
             opacity: 0.5,
           }}
-          // 不设置 loop，播放完即停止
+        />
+      </div>
+
+      {/* 背景视频容器 - 移动端只有上下渐变遮罩，无右侧遮挡 */}
+      <div 
+        className="md:hidden absolute z-0 left-[-200px] right-[-50%]"
+        style={{
+          top: "-20%",
+          bottom: "-20%",
+          maskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%)",
+        }}
+      >
+        <video
+          className="w-full h-full object-cover"
+          src="/cosmic-bg.mp4"
+          muted
+          playsInline
+          autoPlay
+          style={{
+            transform: "scale(0.6)",
+            transformOrigin: "center center",
+            mixBlendMode: "multiply",
+            opacity: 0.5,
+          }}
         />
       </div>
       
