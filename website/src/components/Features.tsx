@@ -569,20 +569,16 @@ export default function Features() {
     isAnimatingRef.current = true;
     setActiveIndex(newIndex);
     
-    // 延迟执行滚动，让模块完全展开后再定位（增加到 300ms）
+    // 延迟执行滚动，让模块完全展开后再定位（增加到 500ms 确保展开完成）
     setTimeout(() => {
       const targetRef = triggerRefs.current[newIndex];
       if (targetRef) {
-        // 直接使用 getBoundingClientRect 获取当前位置
         const rect = targetRef.getBoundingClientRect();
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        // 向下滑动：定位到距离视口顶部 250px（100 + 150）
-        // 向上滑动：定位到距离视口顶部 100px
-        // 02、03、04 模块向下滑动时额外偏移 100px
-        let offset = direction === 'next' ? 250 : 100;
-        if (direction === 'next' && (newIndex === 1 || newIndex === 2 || newIndex === 3)) {
-          offset = 350; // 02、03、04 模块额外向下 100px
-        }
+        
+        // 自定义 offset: 01=80px, 02=160px, 03=190px, 04=220px
+        const offsets = [80, 160, 190, 220];
+        const offset = offsets[newIndex];
         const targetPosition = scrollTop + rect.top - offset;
         
         window.scrollTo({
@@ -590,7 +586,7 @@ export default function Features() {
           behavior: 'smooth'
         });
       }
-    }, 300);
+    }, 500);
     
     // 动画完成后解锁（1.5秒确保动画流畅完成）
     setTimeout(() => {
@@ -709,8 +705,8 @@ export default function Features() {
           </div>
         </div>
 
-        {/* 模块列表 */}
-        <div>
+        {/* 桌面端：模块列表（折叠展开效果） */}
+        <div className="hidden md:block">
           {modules.map((module, index) => (
             <div 
               key={index} 
@@ -722,23 +718,99 @@ export default function Features() {
                 isExpanded={activeIndex === index}
                 onClick={() => {
                   setActiveIndex(index);
-                  // 点击时滚动到模块（使用与向下滑动相同的定位逻辑）
+                  // 点击时滚动到模块（依次叠加 offset）
                   setTimeout(() => {
                     const targetRef = triggerRefs.current[index];
                     if (targetRef) {
                       const rect = targetRef.getBoundingClientRect();
                       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                      // 01 模块：250px，02、03、04 模块：350px
-                      const offset = index === 0 ? 250 : 350;
+                      // 自定义 offset: 01=80px, 02=160px, 03=190px, 04=220px
+                      const offsets = [80, 160, 190, 220];
+                      const offset = offsets[index];
                       const targetPosition = scrollTop + rect.top - offset;
                       window.scrollTo({
                         top: Math.max(0, targetPosition),
                         behavior: 'smooth'
                       });
                     }
-                  }, 300);
+                  }, 500);
                 }}
               />
+            </div>
+          ))}
+        </div>
+
+        {/* 移动端：瀑布流布局（无折叠效果） */}
+        <div className="md:hidden">
+          {modules.map((module, index) => (
+            <div key={index} className="relative border-t border-white/20">
+              {/* 模块头部 */}
+              <div className="px-6 pt-8 pb-6">
+                <div className="flex items-start gap-4 mb-4">
+                  <span className={`font-mono text-xl ${
+                    index === 0 ? "text-paraflow-green" : 
+                    index === 1 ? "text-purple-400" : 
+                    index === 2 ? "text-blue-400" : 
+                    "text-rose-400"
+                  }`}>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    index === 0 ? "bg-paraflow-green/20 border border-paraflow-green/30" : 
+                    index === 1 ? "bg-purple-400/20 border border-purple-400/30" : 
+                    index === 2 ? "bg-blue-400/20 border border-blue-400/30" : 
+                    "bg-rose-400/20 border border-rose-400/30"
+                  }`}>
+                    {module.icon}
+                  </div>
+                  
+                  <h3 className="font-display text-xl text-white leading-tight flex-1">
+                    {module.title.includes('\n') ? (
+                      <>
+                        {module.title.split('\n')[0]}
+                        <br />
+                        <span className={
+                          index === 0 ? "text-paraflow-green" : 
+                          index === 1 ? "text-purple-400" : 
+                          index === 2 ? "text-blue-400" : 
+                          "text-rose-400"
+                        }>{module.title.split('\n')[1]}</span>
+                      </>
+                    ) : module.title}
+                  </h3>
+                </div>
+                
+                <p className="text-white/40 text-sm leading-relaxed mb-4">
+                  {module.description}
+                </p>
+                
+                <div className="flex flex-wrap gap-2">
+                  {module.features.map((feature, i) => (
+                    <span 
+                      key={i}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-white/20 rounded-full text-xs text-white/40"
+                    >
+                      <span className={`w-1 h-1 rounded-full ${
+                        index === 0 ? "bg-paraflow-green" : 
+                        index === 1 ? "bg-purple-400" : 
+                        index === 2 ? "bg-blue-400" : 
+                        "bg-rose-400"
+                      }`} />
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              {/* 卡片网格 */}
+              <div className="px-6 pb-8">
+                <div className="grid grid-cols-2 gap-3">
+                  {module.cards.map((card, cardIndex) => (
+                    <FeatureCard key={cardIndex} {...card} />
+                  ))}
+                </div>
+              </div>
             </div>
           ))}
         </div>

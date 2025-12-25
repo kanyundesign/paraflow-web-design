@@ -43,29 +43,63 @@ export default function CTA() {
         }}
       />
       
-      {/* 背景视频容器 - 响应式定位 */}
+      {/* 背景视频容器 - 移动端 */}
       <div 
-        className="absolute z-0 left-[-100px] md:left-[-800px] lg:left-[-1100px] right-[-100px] md:right-[-20%]"
-        style={{
-          top: "-20%",
-          bottom: "-20%",
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 85%, transparent 100%)",
-        }}
+        className="md:hidden absolute z-0 inset-0 overflow-hidden"
+      >
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src="/cosmic-bg.mp4"
+          muted
+          playsInline
+          autoPlay
+          loop
+          preload="auto"
+          style={{
+            opacity: 0.5,
+            minWidth: '100%',
+            minHeight: '100%',
+          }}
+        />
+        {/* 上下渐变遮罩 */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(to bottom, black 0%, transparent 20%, transparent 80%, black 100%)",
+          }}
+        />
+      </div>
+      
+      {/* 背景视频容器 - 桌面端 */}
+      <div 
+        className="hidden md:block absolute z-0 inset-0 overflow-hidden"
       >
         <video
           ref={videoRef}
-          className="w-full h-full object-cover"
+          className="absolute w-full h-full object-cover"
           src="/cosmic-bg.mp4"
           muted
           playsInline
           autoPlay
           preload="auto"
           style={{
-            transform: "scale(0.6)",
-            transformOrigin: "center center",
-            mixBlendMode: "multiply",
+            left: "calc(-40% + 350px)",
+            width: "140%",
             opacity: 0.5,
+          }}
+        />
+        {/* 上下渐变遮罩 */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(to bottom, black 0%, transparent 15%, transparent 85%, black 100%)",
+          }}
+        />
+        {/* 右侧渐变遮罩 */}
+        <div 
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(to right, transparent 0%, transparent 60%, black 100%)",
           }}
         />
       </div>
