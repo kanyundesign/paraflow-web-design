@@ -34,6 +34,15 @@ export default function CTA() {
 
   return (
     <section ref={sectionRef} className="relative bg-black pt-24 pb-0 overflow-hidden -mt-16">
+      {/* 顶部装饰线 - 绿色炫彩渐变 */}
+      <div 
+        className="absolute left-0 right-0 h-[0.5px] z-20"
+        style={{
+          top: "42px",
+          background: "linear-gradient(90deg, transparent 0%, rgba(0, 192, 92, 0.2) 15%, rgba(0, 192, 92, 0.5) 30%, rgba(121, 242, 0, 0.8) 45%, rgba(0, 255, 128, 0.9) 50%, rgba(121, 242, 0, 0.8) 55%, rgba(0, 192, 92, 0.5) 70%, rgba(0, 192, 92, 0.2) 85%, transparent 100%)",
+        }}
+      />
+      
       {/* 背景视频容器 */}
       <div 
         className="absolute z-0 flex items-center justify-center"
@@ -72,7 +81,7 @@ export default function CTA() {
       {/* 主内容 */}
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8 text-center">
         {/* 主标题 */}
-        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white italic leading-tight mb-6">
+        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white leading-tight mb-6">
           Start creating with
           <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-paraflow-green to-paraflow-green-light">

@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom font imports - 使用更优雅的衬线字体 */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap');
+/* Custom font imports - Newsreader (类似 Tiempos 风格) */
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,200;6..72,300;6..72,400;6..72,500;6..72,600;6..72,700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Paraflow 品牌色 */
@@ -37,9 +37,10 @@ body {
   overflow-x: hidden;
 }
 
-/* 人文衬线字体用于标题 - Playfair Display */
+/* 新闻杂志衬线字体 - Newsreader (类似 Tiempos) */
 .font-display {
-  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
+  font-weight: 500;
   font-feature-settings: 'liga' 1, 'kern' 1;
 }
 

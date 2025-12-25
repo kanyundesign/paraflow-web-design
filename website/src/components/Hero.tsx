@@ -4,11 +4,13 @@ import { useEffect, useRef, useState, useMemo } from "react";
 import { ArrowRight, Play } from "lucide-react";
 import StarBorder from "./StarBorder";
 import Image from "next/image";
+import DoubleDiamondAscii from "./DoubleDiamondAscii";
 
 export default function Hero() {
   const contentRef = useRef<HTMLDivElement>(null);
   const [typedText, setTypedText] = useState("");
   const [isGreen, setIsGreen] = useState(false); // 第三次尝试时变绿
+  const [hasStrikethrough, setHasStrikethrough] = useState(false); // 删除线效果
 
   useEffect(() => {
     const content = contentRef.current;
@@ -28,7 +30,7 @@ export default function Hero() {
   useEffect(() => {
     // 定义打字序列
     const sequence = [
-      // 第一次尝试：打出 "Everyone"，暂停，删除回空（白色）
+      // 第一次尝试：打出 "Everyone"，暂停，删除线，删除回空（白色）
       { text: "E", delay: 120 },
       { text: "Ev", delay: 100 },
       { text: "Eve", delay: 100 },
@@ -37,18 +39,19 @@ export default function Hero() {
       { text: "Everyo", delay: 100 },
       { text: "Everyon", delay: 100 },
       { text: "Everyone", delay: 100 },
-      { text: "Everyone", delay: 1200 }, // 暂停
-      { text: "Everyon", delay: 80 },
-      { text: "Everyo", delay: 80 },
-      { text: "Every", delay: 80 },
-      { text: "Ever", delay: 80 },
-      { text: "Eve", delay: 80 },
-      { text: "Ev", delay: 80 },
-      { text: "E", delay: 80 },
-      { text: "", delay: 80 },
-      { text: "", delay: 600 }, // 暂停
+      { text: "Everyone", delay: 800 }, // 暂停
+      { text: "Everyone", delay: 600, strikethrough: true }, // 添加删除线
+      { text: "Everyon", delay: 60, strikethrough: true },
+      { text: "Everyo", delay: 60, strikethrough: true },
+      { text: "Every", delay: 60, strikethrough: true },
+      { text: "Ever", delay: 60, strikethrough: true },
+      { text: "Eve", delay: 60, strikethrough: true },
+      { text: "Ev", delay: 60, strikethrough: true },
+      { text: "E", delay: 60, strikethrough: true },
+      { text: "", delay: 60, clearStrikethrough: true },
+      { text: "", delay: 500 }, // 暂停
       
-      // 第二次尝试：打出 "Maker Builder"，暂停，删除回空（白色）
+      // 第二次尝试：打出 "Maker Builder"，暂停，删除线，删除回空（白色）
       { text: "M", delay: 120 },
       { text: "Ma", delay: 100 },
       { text: "Mak", delay: 100 },
@@ -62,23 +65,24 @@ export default function Hero() {
       { text: "Maker Build", delay: 100 },
       { text: "Maker Builde", delay: 100 },
       { text: "Maker Builder", delay: 100 },
-      { text: "Maker Builder", delay: 1200 }, // 暂停
-      { text: "Maker Builde", delay: 80 },
-      { text: "Maker Build", delay: 80 },
-      { text: "Maker Buil", delay: 80 },
-      { text: "Maker Bui", delay: 80 },
-      { text: "Maker Bu", delay: 80 },
-      { text: "Maker B", delay: 80 },
-      { text: "Maker ", delay: 80 },
-      { text: "Maker", delay: 80 },
-      { text: "Make", delay: 80 },
-      { text: "Mak", delay: 80 },
-      { text: "Ma", delay: 80 },
-      { text: "M", delay: 80 },
-      { text: "", delay: 80 },
-      { text: "", delay: 600, turnGreen: true }, // 暂停，变绿 - 索引 49
+      { text: "Maker Builder", delay: 800 }, // 暂停
+      { text: "Maker Builder", delay: 600, strikethrough: true }, // 添加删除线
+      { text: "Maker Builde", delay: 60, strikethrough: true },
+      { text: "Maker Build", delay: 60, strikethrough: true },
+      { text: "Maker Buil", delay: 60, strikethrough: true },
+      { text: "Maker Bui", delay: 60, strikethrough: true },
+      { text: "Maker Bu", delay: 60, strikethrough: true },
+      { text: "Maker B", delay: 60, strikethrough: true },
+      { text: "Maker ", delay: 60, strikethrough: true },
+      { text: "Maker", delay: 60, strikethrough: true },
+      { text: "Make", delay: 60, strikethrough: true },
+      { text: "Mak", delay: 60, strikethrough: true },
+      { text: "Ma", delay: 60, strikethrough: true },
+      { text: "M", delay: 60, strikethrough: true },
+      { text: "", delay: 60, clearStrikethrough: true },
+      { text: "", delay: 500, turnGreen: true }, // 暂停，变绿
       
-      // 第三次：打出 "Visual"，保持不变（绿色）- 从索引 50 开始
+      // 第三次：打出 "Visual"，保持不变（绿色）
       { text: "V", delay: 120 },
       { text: "Vi", delay: 100 },
       { text: "Vis", delay: 100 },
@@ -100,6 +104,14 @@ export default function Hero() {
       // 检查是否需要变绿
       if (step.turnGreen) {
         setIsGreen(true);
+      }
+      
+      // 检查删除线状态
+      if (step.strikethrough) {
+        setHasStrikethrough(true);
+      }
+      if (step.clearStrikethrough) {
+        setHasStrikethrough(false);
       }
       
       setTypedText(step.text);
@@ -211,46 +223,24 @@ export default function Hero() {
         ))}
       </div>
 
-      {/* ASCII GIF 背景 - 倾斜，放大，左移与按钮对齐 */}
+      {/* 双钻模型 ASCII 动效背景 */}
       <div 
-        className="absolute right-0 top-10 w-[1100px] h-[700px] z-[1] max-w-[1400px]"
+        className="absolute inset-0 z-[1]"
         style={{ 
-          transform: "rotate(-20deg) scale(1.35) translateX(0px) translateY(100px)",
-          right: "calc(50% - 700px)"
+          transform: "rotate(-15deg) scale(1.3)",
+          transformOrigin: "center center"
         }}
       >
-        {/* 底层 - 基础效果 */}
-        <Image
-          src="/galaxy-ascii.gif"
-          alt="Galaxy ASCII Art"
-          fill
-          className="object-contain mix-blend-screen"
-          style={{
-            filter: "brightness(1.8) saturate(2.5) hue-rotate(10deg) contrast(1.2) blur(0.3px)",
-          }}
-          unoptimized
-          priority
-        />
-        {/* 叠加层 - 发光增强 */}
-        <Image
-          src="/galaxy-ascii.gif"
-          alt=""
-          fill
-          className="object-contain mix-blend-screen opacity-50"
-          style={{
-            filter: "brightness(2.5) saturate(3) hue-rotate(10deg) blur(2px)",
-          }}
-          unoptimized
-        />
+        <DoubleDiamondAscii />
       </div>
 
       <div ref={contentRef} className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8 pt-40">
         
         {/* 顶部标签 */}
-        <div className="flex justify-start mb-16">
-          <div className="group inline-flex items-center gap-2.5 px-3.5 py-2 border border-paraflow-green/30 rounded-full text-xs hover:border-paraflow-green/50 transition-colors cursor-pointer">
-            {/* 绿色圆点 */}
-            <span className="w-2 h-2 bg-paraflow-green rounded-full shadow-[0_0_6px_rgba(0,192,92,0.6)]" />
+        <div className="flex justify-center mb-16">
+          <div className="group inline-flex items-center gap-2.5 px-3.5 py-2 bg-black border border-paraflow-green/30 rounded-full text-xs hover:border-paraflow-green/50 transition-colors cursor-pointer">
+            {/* 热点 emoji */}
+            <span className="text-sm">🔥</span>
             <span className="text-paraflow-green font-medium tracking-wider">UPDATE:</span>
             <span className="text-gray-300 tracking-wider">COPY TO FIGMA LIVE</span>
             <ArrowRight className="w-3 h-3 text-white group-hover:text-paraflow-green group-hover:translate-x-1 transition-all duration-300" />
@@ -258,15 +248,15 @@ export default function Hero() {
         </div>
 
         {/* 主标题 - 两行 */}
-        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-[90px] text-white leading-[1.05] mb-0">
-          <span className="italic block">
-            The <span className={isGreen ? "text-paraflow-green" : "text-white"}>{typedText}</span>
+        <h1 className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-[120px] text-white leading-[1.05] mb-0 text-center">
+          <span className="block">
+            The <span className={`${isGreen ? "text-paraflow-green" : "text-white"} ${hasStrikethrough ? "line-through decoration-2" : ""}`}>{typedText}</span>
             <span 
               className={`inline-block w-[3px] h-[0.85em] ml-1 align-top animate-blink ${isGreen ? "bg-paraflow-green" : "bg-white"}`}
               style={{ marginTop: '0.1em' }}
             />
           </span>
-          <span className="italic block">Coding Agent</span>
+          <span className="block">Coding Agent</span>
         </h1>
       </div>
 

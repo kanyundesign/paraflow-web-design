@@ -61,15 +61,31 @@ export default function Workflow() {
     return () => observer.disconnect();
   }, []);
 
-  // 自动轮播 - 当用户交互后暂停，5秒无操作后恢复
+  // 自动轮播 - 1 → 2 → 3 → 2 → 1 → 2 → 3 ... 来回递进
+  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
+  
   useEffect(() => {
     if (!isVisible || isPaused) return;
     
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % steps.length);
+      setActiveIndex((prev) => {
+        if (direction === 'forward') {
+          if (prev >= steps.length - 1) {
+            setDirection('backward');
+            return prev - 1;
+          }
+          return prev + 1;
+        } else {
+          if (prev <= 0) {
+            setDirection('forward');
+            return prev + 1;
+          }
+          return prev - 1;
+        }
+      });
     }, 4000);
     return () => clearInterval(interval);
-  }, [isVisible, isPaused, steps.length]);
+  }, [isVisible, isPaused, steps.length, direction]);
 
   // 处理用户点击 - 暂停自动切换，5秒后恢复
   const handleCardClick = (index: number) => {
@@ -96,7 +112,7 @@ export default function Workflow() {
     };
   }, []);
 
-  // 计算每张卡片的位置和样式
+  // 计算每张卡片的位置和样式 - 环绕视角效果
   const getCardStyle = (index: number) => {
     const diff = index - activeIndex;
     // 处理循环
@@ -108,28 +124,30 @@ export default function Workflow() {
     const isLeft = position === -1;
     const isRight = position === 1;
 
+    // 中间卡片正对，两侧卡片带透视旋转营造环绕效果
     return {
       transform: isCenter 
-        ? "translateX(0) scale(1)" 
+        ? "translateX(0) scale(1) perspective(1000px) rotateY(0deg)" 
         : isLeft 
-          ? "translateX(-88%) scale(0.9)" 
+          ? "translateX(-75%) scale(0.85) perspective(1000px) rotateY(25deg)" 
           : isRight 
-            ? "translateX(88%) scale(0.9)"
-            : "translateX(0) scale(0.7)",
-      opacity: isCenter ? 1 : 0.6,
+            ? "translateX(75%) scale(0.85) perspective(1000px) rotateY(-25deg)"
+            : "translateX(0) scale(0.7) perspective(1000px) rotateY(0deg)",
+      opacity: isCenter ? 1 : 0.5,
       zIndex: isCenter ? 10 : 5,
+      filter: isCenter ? 'none' : 'brightness(0.8)',
     };
   };
 
   return (
-    <section ref={sectionRef} className="relative bg-black py-32 overflow-hidden">
-      {/* 顶部横向装饰线 - 白色炫彩渐变 */}
+    <section ref={sectionRef} className="relative bg-black pt-20 pb-32 overflow-hidden">
+      {/* 顶部横向装饰线 */}
       <div 
-        className="absolute top-0 left-0 right-0 h-[0.5px] z-10"
-        style={{
-          background: "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 15%, rgba(255, 255, 255, 0.3) 30%, rgba(255, 255, 255, 0.4) 45%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.4) 55%, rgba(255, 255, 255, 0.3) 70%, rgba(255, 255, 255, 0.1) 85%, transparent 100%)",
-        }}
-      />
+        className="absolute top-0 left-0 right-0 h-px z-10"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 15%, rgba(255,255,255,0.4) 85%, transparent 100%)'
+          }}
+        />
       
       {/* 星空背景 */}
       <StarBackground starCount={80} opacity={1} />
@@ -146,19 +164,38 @@ export default function Workflow() {
       </div>
 
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8">
+        {/* 左侧竖向装饰线 */}
+        <div className="absolute z-20 left-[18%] -top-[79px] h-[300px] w-px bg-white/40" />
+        {/* 左下角正方形 */}
+        <div className="absolute z-20 left-[18%] top-[221px] -translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
+        
+        {/* 右侧竖向装饰线 */}
+        <div className="absolute z-20 right-[18%] -top-[79px] h-[300px] w-px bg-white/40" />
+        {/* 右上角正方形 */}
+        <div className="absolute z-20 right-[18%] -top-[77px] translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
+
         {/* 区块标题 */}
-        <div className={`text-center mb-20 transition-all duration-1000 ${
+        <div className={`text-center mb-16 transition-all duration-1000 ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
         }`}>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-white italic leading-tight mb-6">
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-6">
             Define, design and develop
             <br />
             <span className="text-gray-500">on an infinite canvas.</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-white/30 text-lg mx-auto mb-8 whitespace-nowrap h-[52px]">
             Organize your ideas in order, design beautifully, and turn them into production apps.
           </p>
         </div>
+        
+        {/* 横向装饰线 - 通栏（无动画） */}
+        <div 
+          className="absolute left-1/2 -translate-x-1/2 h-[0.5px] top-[224px]"
+            style={{
+              width: '100vw',
+              background: "linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 15%, rgba(255, 255, 255, 0.3) 30%, rgba(255, 255, 255, 0.5) 45%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0.5) 55%, rgba(255, 255, 255, 0.3) 70%, rgba(255, 255, 255, 0.1) 85%, transparent 100%)"
+            }}
+          />
 
         {/* 旋转木马卡片区域 */}
         <div className={`relative h-[450px] md:h-[400px] transition-all duration-1000 ${
@@ -176,6 +213,7 @@ export default function Workflow() {
                     transform: style.transform,
                     opacity: style.opacity,
                     zIndex: style.zIndex,
+                    filter: style.filter,
                   }}
                   onClick={() => handleCardClick(index)}
                 >
@@ -236,15 +274,15 @@ export default function Workflow() {
           </div>
         </div>
 
-        {/* 进度指示器 */}
+        {/* 进度指示器 - 直线 */}
         <div className="flex justify-center gap-3 mt-8">
           {steps.map((_, index) => (
             <button
               key={index}
               onClick={() => handleCardClick(index)}
-              className={`h-1 rounded-full transition-all duration-700 ease-out ${
+              className={`h-0.5 rounded-full transition-all duration-700 ease-out ${
                 activeIndex === index 
-                  ? "w-12 bg-paraflow-green" 
+                  ? "w-12 bg-paraflow-green shadow-[0_0_10px_rgba(0,192,92,0.5)]" 
                   : "w-6 bg-white/20 hover:bg-white/30"
               }`}
             />
