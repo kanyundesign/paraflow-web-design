@@ -203,8 +203,9 @@ export default function Workflow() {
             <br />
             <span className="text-gray-500">on an infinite canvas.</span>
           </h2>
-          <p className="text-white/30 text-lg mx-auto mb-8 whitespace-nowrap h-[52px]">
-            Organize your ideas in order, design beautifully, and turn them into production apps.
+          <p className="text-white/30 text-lg mx-auto mb-8 lg:whitespace-nowrap h-auto lg:h-[52px] text-center">
+            <span className="hidden lg:inline">Organize your ideas in order, design beautifully, and turn them into production apps.</span>
+            <span className="lg:hidden">Organize your ideas in order, design beautifully,<br />and turn them into production apps.</span>
           </p>
         </div>
         

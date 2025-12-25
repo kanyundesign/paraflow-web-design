@@ -43,12 +43,11 @@ export default function CTA() {
         }}
       />
       
-      {/* 背景视频容器 */}
+      {/* 背景视频容器 - 移动端向右偏移 300px */}
       <div 
-        className="absolute z-0 flex items-center justify-center"
+        className="absolute z-0 flex items-center justify-center left-[-800px] lg:left-[-1100px]"
         style={{
           top: "-20%",
-          left: "-1100px",
           right: "-20%",
           bottom: "-20%",
           maskImage: "linear-gradient(to bottom, transparent 0%, black 15%, black 95%, transparent 100%), linear-gradient(to right, black 0%, black 60%, transparent 90%)",
