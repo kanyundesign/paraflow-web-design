@@ -260,8 +260,8 @@ export default function Hero() {
         </h1>
       </div>
 
-      {/* 中间留白区域 */}
-      <div className="flex-1 min-h-[80px] sm:min-h-[120px] md:min-h-[200px] lg:min-h-[300px]" />
+      {/* 中间留白区域 - 减少50px提升首屏效率 */}
+      <div className="flex-1 min-h-[30px] sm:min-h-[70px] md:min-h-[150px] lg:min-h-[250px]" />
 
       {/* 底部内容区域 */}
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8">
