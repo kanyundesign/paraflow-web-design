@@ -6,28 +6,39 @@ import { ArrowRight } from "lucide-react";
 export default function CTA() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+
+  // 尝试播放视频的函数
+  const tryPlayVideo = (video: HTMLVideoElement | null) => {
+    if (video) {
+      video.muted = true; // 确保静音
+      video.playbackRate = 0.6;
+      video.play().catch(() => {});
+    }
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          // 当进入视口时播放视频
-          if (videoRef.current) {
-            videoRef.current.playbackRate = 0.6; // 缓慢播放（0.6倍速）
-            videoRef.current.play().catch(() => {
-              // 忽略自动播放错误
-            });
-          }
+          tryPlayVideo(videoRef.current);
+          tryPlayVideo(mobileVideoRef.current);
         }
       },
-      { threshold: 0.2 }
+      { threshold: 0.1 }
     );
 
     if (sectionRef.current) {
       observer.observe(sectionRef.current);
     }
+
+    // 页面加载后也尝试播放
+    setTimeout(() => {
+      tryPlayVideo(videoRef.current);
+      tryPlayVideo(mobileVideoRef.current);
+    }, 1000);
 
     return () => observer.disconnect();
   }, []);
@@ -48,6 +59,7 @@ export default function CTA() {
         className="md:hidden absolute z-0 inset-0 overflow-hidden"
       >
         <video
+          ref={mobileVideoRef}
           className="absolute inset-0 w-full h-full object-cover"
           src="/cosmic-bg.mp4"
           muted
@@ -55,10 +67,9 @@ export default function CTA() {
           autoPlay
           loop
           preload="auto"
+          webkit-playsinline="true"
           style={{
             opacity: 0.5,
-            minWidth: '100%',
-            minHeight: '100%',
           }}
         />
         {/* 上下渐变遮罩 */}
