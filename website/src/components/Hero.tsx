@@ -223,9 +223,9 @@ export default function Hero() {
         ))}
       </div>
 
-      {/* 双钻模型 ASCII 动效背景 */}
+      {/* 双钻模型 ASCII 动效背景 - 移动端隐藏 */}
       <div 
-        className="absolute inset-0 z-[1]"
+        className="hidden lg:block absolute inset-0 z-[1]"
         style={{ 
           transform: "rotate(-15deg) scale(1.3)",
           transformOrigin: "center center"

@@ -223,8 +223,8 @@ export default function Features() {
           </div>
         </div>
 
-        {/* 桌面端：Sticky Scroll 主体区域 */}
-        <div className="relative hidden lg:block">
+        {/* 桌面端：Sticky Scroll 主体区域（md 及以上显示）*/}
+        <div className="relative hidden md:block">
           {/* 顶部装饰线 */}
           <div 
             className="absolute top-0 left-0 right-0 h-px"
@@ -400,8 +400,8 @@ export default function Features() {
           />
         </div>
 
-        {/* 移动端：瀑布流布局，所有模块和卡片依次展示 */}
-        <div className="lg:hidden">
+        {/* 移动端：瀑布流布局，所有模块和卡片依次展示（仅 md 以下显示）*/}
+        <div className="md:hidden">
           {/* 顶部装饰线 */}
           <div 
             className="h-px"

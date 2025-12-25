@@ -43,9 +43,9 @@ export default function CTA() {
         }}
       />
       
-      {/* 背景视频容器 - 移动端向右偏移 300px */}
+      {/* 背景视频容器 - 移动端向右偏移 600px */}
       <div 
-        className="absolute z-0 flex items-center justify-center left-[-800px] lg:left-[-1100px]"
+        className="absolute z-0 flex items-center justify-center left-[-500px] lg:left-[-1100px]"
         style={{
           top: "-20%",
           right: "-20%",

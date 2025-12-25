@@ -184,34 +184,34 @@ export default function Workflow() {
       </div>
 
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8">
-        {/* 左侧竖向装饰线 */}
-        <div className="absolute z-20 left-[18%] -top-[79px] h-[300px] w-px bg-white/40" />
-        {/* 左下角正方形 */}
-        <div className="absolute z-20 left-[18%] top-[221px] -translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
+        {/* 左侧竖向装饰线 - 移动端隐藏 */}
+        <div className="hidden lg:block absolute z-20 left-[18%] -top-[79px] h-[300px] w-px bg-white/40" />
+        {/* 左下角正方形 - 移动端隐藏 */}
+        <div className="hidden lg:block absolute z-20 left-[18%] top-[221px] -translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
         
-        {/* 右侧竖向装饰线 */}
-        <div className="absolute z-20 right-[18%] -top-[76px] h-[300px] w-px bg-white/40" />
-        {/* 右上角正方形 */}
-        <div className="absolute z-20 right-[18%] -top-[77px] translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
+        {/* 右侧竖向装饰线 - 移动端隐藏 */}
+        <div className="hidden lg:block absolute z-20 right-[18%] -top-[76px] h-[300px] w-px bg-white/40" />
+        {/* 右上角正方形 - 移动端隐藏 */}
+        <div className="hidden lg:block absolute z-20 right-[18%] -top-[77px] translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
 
-        {/* 区块标题 */}
-        <div className={`text-center mb-16 transition-all duration-1000 ${
+        {/* 区块标题 - 移动端上移使其居中于两条横线之间 */}
+        <div className={`text-center mb-8 lg:mb-16 -mt-4 lg:mt-0 transition-all duration-1000 ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
         }`}>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-6">
+          <h2 className="font-display text-3xl md:text-5xl lg:text-6xl text-white leading-tight mb-4 lg:mb-6">
             Define, design and develop
             <br />
             <span className="text-gray-500">on an infinite canvas.</span>
           </h2>
-          <p className="text-white/30 text-lg mx-auto mb-8 lg:whitespace-nowrap h-auto lg:h-[52px] text-center">
+          <p className="text-white/30 text-base lg:text-lg mx-auto mb-4 lg:mb-8 lg:whitespace-nowrap h-auto lg:h-[52px] text-center">
             <span className="hidden lg:inline">Organize your ideas in order, design beautifully, and turn them into production apps.</span>
             <span className="lg:hidden">Organize your ideas in order, design beautifully,<br />and turn them into production apps.</span>
           </p>
         </div>
         
-        {/* 横向装饰线 - 通栏（无动画） */}
+        {/* 横向装饰线 - 通栏（无动画）- 移动端位置调整 */}
         <div 
-          className="absolute left-1/2 -translate-x-1/2 h-px top-[224px]"
+          className="absolute left-1/2 -translate-x-1/2 h-px top-[180px] lg:top-[224px]"
             style={{
               width: '100vw',
               background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 15%, rgba(255,255,255,0.4) 85%, transparent 100%)'
