@@ -65,6 +65,8 @@ export default function CTA() {
             minWidth: '100%',
             minHeight: '100%',
             objectFit: 'cover',
+            marginLeft: '-100px',
+            width: 'calc(100% + 100px)',
           }}
         />
         {/* 上下渐变遮罩 */}
