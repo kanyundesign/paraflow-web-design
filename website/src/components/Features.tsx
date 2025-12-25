@@ -176,8 +176,6 @@ export default function Features() {
     };
   }, []);
 
-  const currentModule = modules[activeIndex];
-
   return (
     <section ref={sectionRef} className="relative bg-black overflow-hidden">
       {/* 星空背景 */}
@@ -225,8 +223,8 @@ export default function Features() {
           </div>
         </div>
 
-        {/* Sticky Scroll 主体区域 */}
-        <div className="relative">
+        {/* 桌面端：Sticky Scroll 主体区域 */}
+        <div className="relative hidden lg:block">
           {/* 顶部装饰线 */}
           <div 
             className="absolute top-0 left-0 right-0 h-px"
@@ -235,11 +233,11 @@ export default function Features() {
             }}
           />
           
-          <div className="flex flex-col lg:flex-row">
+          <div className="flex">
             {/* 左侧：滚动的模块描述 */}
-            <div className="w-full lg:w-1/2 relative">
+            <div className="w-1/2 relative">
               {/* 左侧竖向装饰线 */}
-              <div className="hidden md:block absolute left-[71px] lg:left-[79px] top-0 bottom-0 w-px bg-white/40" />
+              <div className="absolute left-[79px] top-0 bottom-0 w-px bg-white/40" />
               
               {modules.map((module, index) => (
                 <div 
@@ -257,12 +255,12 @@ export default function Features() {
                     />
                   )}
                   
-                  <div className={`px-6 lg:px-8 py-24 lg:py-32 min-h-[60vh] lg:min-h-[80vh] flex flex-col justify-center transition-opacity duration-500 ${
+                  <div className={`px-8 py-32 min-h-[80vh] flex flex-col justify-center transition-opacity duration-500 ${
                     activeIndex === index ? 'opacity-100' : 'opacity-40'
                   }`}>
                     {/* 序号 + 图标 + 标题 */}
-                    <div className="flex items-start gap-4 md:gap-6 mb-8">
-                      <span className={`font-mono text-2xl md:text-3xl lg:text-4xl transition-colors duration-500 ${
+                    <div className="flex items-start gap-6 mb-8">
+                      <span className={`font-mono text-4xl transition-colors duration-500 ${
                         activeIndex === index ? module.colorClass : "text-gray-700"
                       }`}>
                         {String(index + 1).padStart(2, "0")}
@@ -282,7 +280,7 @@ export default function Features() {
                         {module.icon}
                       </div>
                       
-                      <h3 className={`font-display text-2xl sm:text-3xl md:text-4xl lg:text-[42px] leading-tight transition-colors duration-500 ${
+                      <h3 className={`font-display text-[42px] leading-tight transition-colors duration-500 ${
                         activeIndex === index ? "text-white" : "text-gray-600"
                       }`}>
                         {module.title.includes('\n') ? (
@@ -298,7 +296,7 @@ export default function Features() {
                     </div>
 
                     {/* 描述文案 */}
-                    <div className="ml-0 md:ml-[88px] lg:ml-[104px]">
+                    <div className="ml-[104px]">
                       <p className={`text-white/40 text-lg leading-relaxed mb-8 max-w-lg transition-all duration-500 ${
                         activeIndex === index ? "opacity-100" : "opacity-50"
                       }`}>
@@ -333,7 +331,7 @@ export default function Features() {
             </div>
             
             {/* 右侧：固定的卡片区域 */}
-            <div className="hidden lg:block w-1/2 relative">
+            <div className="w-1/2 relative">
               {/* 右侧竖向装饰线 */}
               <div className="absolute right-[18%] top-0 bottom-0 w-px bg-white/40" />
               
@@ -372,7 +370,6 @@ export default function Features() {
                       <button
                         key={index}
                         onClick={() => {
-                          // 滚动到对应模块
                           const targetRef = moduleRefs.current[index];
                           if (targetRef) {
                             targetRef.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -394,24 +391,108 @@ export default function Features() {
             </div>
           </div>
           
-          {/* 移动端：卡片直接跟随在描述后面 */}
-          <div className="lg:hidden px-6 pb-16">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {currentModule.cards.map((card, cardIndex) => (
-                <div
-                  key={cardIndex}
-                  className="transition-all duration-500"
-                  style={{ transitionDelay: `${cardIndex * 100}ms` }}
-                >
-                  <FeatureCard {...card} />
-                </div>
-              ))}
-            </div>
-          </div>
-          
           {/* 底部装饰线 */}
           <div 
             className="absolute bottom-0 left-0 right-0 h-px"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 10%, rgba(255,255,255,0.4) 90%, transparent 100%)'
+            }}
+          />
+        </div>
+
+        {/* 移动端：瀑布流布局，所有模块和卡片依次展示 */}
+        <div className="lg:hidden">
+          {/* 顶部装饰线 */}
+          <div 
+            className="h-px"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 10%, rgba(255,255,255,0.4) 90%, transparent 100%)'
+            }}
+          />
+          
+          {modules.map((module, index) => (
+            <div key={index} className="relative">
+              {/* 模块分隔线 */}
+              {index > 0 && (
+                <div 
+                  className="h-px"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 10%, rgba(255,255,255,0.2) 90%, transparent 100%)'
+                  }}
+                />
+              )}
+              
+              {/* 模块头部信息 */}
+              <div className="px-6 pt-12 pb-8">
+                {/* 序号 + 图标 + 标题 */}
+                <div className="flex items-start gap-4 mb-6">
+                  <span className={`font-mono text-2xl ${module.colorClass}`}>
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    index === 0 
+                      ? "bg-paraflow-green/20 border border-paraflow-green/30" 
+                      : index === 1 
+                        ? "bg-purple-400/20 border border-purple-400/30"
+                        : index === 2 
+                          ? "bg-blue-400/20 border border-blue-400/30"
+                          : "bg-rose-400/20 border border-rose-400/30"
+                  }`}>
+                    {module.icon}
+                  </div>
+                  
+                  <h3 className="font-display text-xl sm:text-2xl leading-tight text-white flex-1">
+                    {module.title.includes('\n') ? (
+                      <>
+                        {module.title.split('\n')[0]}
+                        <br />
+                        <span className={module.colorClass}>
+                          {module.title.split('\n')[1]}
+                        </span>
+                      </>
+                    ) : module.title}
+                  </h3>
+                </div>
+
+                {/* 描述文案 */}
+                <p className="text-white/40 text-base leading-relaxed mb-6">
+                  {module.description}
+                </p>
+                
+                {/* 标签 */}
+                <div className="flex flex-wrap gap-2">
+                  {module.features.map((feature, i) => (
+                    <span 
+                      key={i}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 border border-white/20 rounded-full text-xs text-white/40"
+                    >
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        index === 0 ? "bg-paraflow-green" : 
+                        index === 1 ? "bg-purple-400" : 
+                        index === 2 ? "bg-blue-400" : 
+                        "bg-rose-400"
+                      }`} />
+                      {feature}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              
+              {/* 卡片瀑布流 */}
+              <div className="px-6 pb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {module.cards.map((card, cardIndex) => (
+                    <FeatureCard key={cardIndex} {...card} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          {/* 底部装饰线 */}
+          <div 
+            className="h-px"
             style={{
               background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 10%, rgba(255,255,255,0.4) 90%, transparent 100%)'
             }}
