@@ -6,18 +6,19 @@ const StarBorder = ({
   color = 'white',
   speed = '6s',
   thickness = 1,
-  variant = 'primary', // 'primary' = 绿色背景, 'secondary' = 黑色背景
+  variant = 'primary', // 'primary' = 绿色渐变背景, 'secondary' = 黑色背景
   children,
   ...rest
 }) => {
   const isPrimary = variant === 'primary';
+  const gradientBg = 'linear-gradient(90deg, #00c05c 0%, #61c200 100%)';
   
   return (
     <Component
       className={`star-border-container ${className}`}
       style={{
         padding: `${thickness}px 0`,
-        background: isPrimary ? '#00C05C' : '#0a0a0a',
+        background: isPrimary ? gradientBg : '#0a0a0a',
         border: isPrimary ? 'none' : '1px solid rgba(255,255,255,0.2)',
         ...rest.style
       }}
@@ -40,7 +41,7 @@ const StarBorder = ({
       <div 
         className="inner-content"
         style={{
-          background: isPrimary ? '#00C05C' : '#0a0a0a',
+          background: isPrimary ? gradientBg : '#0a0a0a',
           color: isPrimary ? 'black' : 'white',
         }}
       >

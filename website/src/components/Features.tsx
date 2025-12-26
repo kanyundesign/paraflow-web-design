@@ -360,15 +360,16 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
                       : index === 2 
                         ? "bg-blue-400/20 border border-blue-400/30"
                         : "bg-rose-400/20 border border-rose-400/30"
-                  : index === 0 
-                    ? "bg-white/5 border border-paraflow-green/30" 
-                    : index === 1 
-                      ? "bg-white/5 border border-purple-400/30"
-                      : index === 2 
-                        ? "bg-white/5 border border-blue-400/30"
-                        : "bg-white/5 border border-rose-400/30"
+                  : "bg-white/5 border border-white/20"
               }`}>
-                {module.icon}
+                {/* 根据展开状态动态渲染不同颜色的 icon */}
+                <div className={`transition-colors duration-500 ${
+                  isExpanded 
+                    ? "" 
+                    : "[&>svg]:text-gray-600"
+                }`}>
+                  {module.icon}
+                </div>
               </div>
               
               <h3 className={`font-display text-[20px] sm:text-[24px] md:text-[30px] lg:text-[36px] transition-colors duration-500 leading-tight ${
@@ -378,12 +379,14 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
                   <>
                     {module.title.split('\n')[0]}
                     <br />
-                    <span className={
-                      index === 0 ? "text-paraflow-green" : 
-                      index === 1 ? "text-purple-400" : 
-                      index === 2 ? "text-blue-400" :
-                      "text-rose-400"
-                    }>{module.title.split('\n')[1]}</span>
+                    <span className={`transition-colors duration-500 ${
+                      isExpanded 
+                        ? index === 0 ? "text-paraflow-green" : 
+                          index === 1 ? "text-purple-400" : 
+                          index === 2 ? "text-blue-400" :
+                          "text-rose-400"
+                        : "text-gray-600"
+                    }`}>{module.title.split('\n')[1]}</span>
                   </>
                 ) : module.title}
               </h3>

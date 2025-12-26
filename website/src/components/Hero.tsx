@@ -8,9 +8,10 @@ import DoubleDiamondAscii from "./DoubleDiamondAscii";
 
 export default function Hero() {
   const contentRef = useRef<HTMLDivElement>(null);
-  const [typedText, setTypedText] = useState("");
-  const [isGreen, setIsGreen] = useState(false); // 第三次尝试时变绿
-  const [hasStrikethrough, setHasStrikethrough] = useState(false); // 删除线效果
+  const [typedText, setTypedText] = useState("Vibe"); // 初始直接显示 Vibe
+  const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null); // 选中高亮范围
+  const [isGreenGradient, setIsGreenGradient] = useState(false); // 绿色渐变效果
+  const [showGradientSweep, setShowGradientSweep] = useState(false); // 绿色渐变划过动画
 
   useEffect(() => {
     const content = contentRef.current;
@@ -26,69 +27,28 @@ export default function Hero() {
     }
   }, []);
 
-  // 打字机效果 - 三次尝试后保持
+  // 打字机效果 - vibe → visual
   useEffect(() => {
     // 定义打字序列
+    // 初始直接显示 "vibe" → 选中 "be" → 删除 "be"
+    // 然后打出 "sual" → 暂停 → 绿色渐变划过
     const sequence = [
-      // 第一次尝试：打出 "Everyone"，暂停，删除线，删除回空（白色）
-      { text: "E", delay: 120 },
-      { text: "Ev", delay: 100 },
-      { text: "Eve", delay: 100 },
-      { text: "Ever", delay: 100 },
-      { text: "Every", delay: 100 },
-      { text: "Everyo", delay: 100 },
-      { text: "Everyon", delay: 100 },
-      { text: "Everyone", delay: 100 },
-      { text: "Everyone", delay: 800 }, // 暂停
-      { text: "Everyone", delay: 600, strikethrough: true }, // 添加删除线
-      { text: "Everyon", delay: 60, strikethrough: true },
-      { text: "Everyo", delay: 60, strikethrough: true },
-      { text: "Every", delay: 60, strikethrough: true },
-      { text: "Ever", delay: 60, strikethrough: true },
-      { text: "Eve", delay: 60, strikethrough: true },
-      { text: "Ev", delay: 60, strikethrough: true },
-      { text: "E", delay: 60, strikethrough: true },
-      { text: "", delay: 60, clearStrikethrough: true },
-      { text: "", delay: 500 }, // 暂停
+      // 初始直接显示 "Vibe"，暂停一会
+      { text: "Vibe", delay: 1200 },
+      { text: "Vibe", delay: 500, select: { start: 2, end: 4 } }, // 选中 "be"
+      { text: "Vibe", delay: 400, select: { start: 2, end: 4 } }, // 保持选中状态
+      { text: "Vi", delay: 100, clearSelect: true }, // 删除 "be"，清除选中
+      { text: "Vi", delay: 300 }, // 暂停
       
-      // 第二次尝试：打出 "Maker Builder"，暂停，删除线，删除回空（白色）
-      { text: "M", delay: 120 },
-      { text: "Ma", delay: 100 },
-      { text: "Mak", delay: 100 },
-      { text: "Make", delay: 100 },
-      { text: "Maker", delay: 100 },
-      { text: "Maker ", delay: 100 },
-      { text: "Maker B", delay: 100 },
-      { text: "Maker Bu", delay: 100 },
-      { text: "Maker Bui", delay: 100 },
-      { text: "Maker Buil", delay: 100 },
-      { text: "Maker Build", delay: 100 },
-      { text: "Maker Builde", delay: 100 },
-      { text: "Maker Builder", delay: 100 },
-      { text: "Maker Builder", delay: 800 }, // 暂停
-      { text: "Maker Builder", delay: 600, strikethrough: true }, // 添加删除线
-      { text: "Maker Builde", delay: 60, strikethrough: true },
-      { text: "Maker Build", delay: 60, strikethrough: true },
-      { text: "Maker Buil", delay: 60, strikethrough: true },
-      { text: "Maker Bui", delay: 60, strikethrough: true },
-      { text: "Maker Bu", delay: 60, strikethrough: true },
-      { text: "Maker B", delay: 60, strikethrough: true },
-      { text: "Maker ", delay: 60, strikethrough: true },
-      { text: "Maker", delay: 60, strikethrough: true },
-      { text: "Make", delay: 60, strikethrough: true },
-      { text: "Mak", delay: 60, strikethrough: true },
-      { text: "Ma", delay: 60, strikethrough: true },
-      { text: "M", delay: 60, strikethrough: true },
-      { text: "", delay: 60, clearStrikethrough: true },
-      { text: "", delay: 500, turnGreen: true }, // 暂停，变绿
-      
-      // 第三次：打出 "Visual"，保持不变（绿色）
-      { text: "V", delay: 120 },
-      { text: "Vi", delay: 100 },
+      // 继续打出 "sual" → "Visual"
       { text: "Vis", delay: 100 },
       { text: "Visu", delay: 100 },
       { text: "Visua", delay: 100 },
       { text: "Visual", delay: 100 },
+      { text: "Visual", delay: 500 }, // 暂停
+      { text: "Visual", delay: 100, startGradientSweep: true }, // 开始绿色渐变划过
+      { text: "Visual", delay: 1000 }, // 等待动画完成
+      { text: "Visual", delay: 100, applyGreenGradient: true }, // 应用最终绿色渐变
       // 最终状态 - 不再继续
     ];
 
@@ -101,17 +61,21 @@ export default function Hero() {
       
       const step = sequence[stepIndex];
       
-      // 检查是否需要变绿
-      if (step.turnGreen) {
-        setIsGreen(true);
+      // 处理选中状态
+      if (step.select) {
+        setSelectedRange(step.select);
+      }
+      if (step.clearSelect) {
+        setSelectedRange(null);
       }
       
-      // 检查删除线状态
-      if (step.strikethrough) {
-        setHasStrikethrough(true);
+      // 处理绿色渐变动画
+      if (step.startGradientSweep) {
+        setShowGradientSweep(true);
       }
-      if (step.clearStrikethrough) {
-        setHasStrikethrough(false);
+      if (step.applyGreenGradient) {
+        setShowGradientSweep(false);
+        setIsGreenGradient(true);
       }
       
       setTypedText(step.text);
@@ -127,16 +91,49 @@ export default function Hero() {
       timeoutId = setTimeout(runStep, step.delay + Math.random() * 30);
     };
 
-    // 延迟开始
+    // 延迟开始 - 页面加载后稍等片刻再开始动画
     const startDelay = setTimeout(() => {
       runStep();
-    }, 1500);
+    }, 800);
 
     return () => {
       clearTimeout(startDelay);
       clearTimeout(timeoutId);
     };
   }, []);
+
+  // 渲染带有选中效果的文字
+  const renderTypedText = () => {
+    if (!typedText) return null;
+    
+    // 如果没有选中范围，直接返回文字
+    if (!selectedRange) {
+      return <span>{typedText}</span>;
+    }
+    
+    // 分割文字：前部分 + 选中部分 + 后部分
+    const before = typedText.slice(0, selectedRange.start);
+    const selected = typedText.slice(selectedRange.start, selectedRange.end);
+    const after = typedText.slice(selectedRange.end);
+    
+    return (
+      <>
+        <span>{before}</span>
+        <span 
+          className="relative"
+          style={{
+            backgroundColor: "rgba(56, 139, 253, 0.4)",
+            borderRadius: "2px",
+            padding: "0 2px",
+            margin: "0 -2px",
+          }}
+        >
+          {selected}
+        </span>
+        <span>{after}</span>
+      </>
+    );
+  };
 
   // 生成星星 - 使用 useMemo 缓存，避免重新渲染时重新生成
   const stars = useMemo(() => Array.from({ length: 200 }, (_, i) => ({
@@ -234,7 +231,7 @@ export default function Hero() {
         <DoubleDiamondAscii />
       </div>
 
-      <div ref={contentRef} className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8 pt-24 md:pt-32 lg:pt-40">
+      <div ref={contentRef} className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8 flex-1 flex flex-col justify-center" style={{ marginTop: '-100px' }}>
         
         {/* 顶部标签 */}
         <div className="flex justify-center mb-8 md:mb-12 lg:mb-16">
@@ -247,55 +244,67 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* 主标题 - 两行 */}
-        <h1 className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-[120px] text-white leading-[1.05] mb-0 text-center">
-          <span className="block">
-            The <span className={`${isGreen ? "text-paraflow-green" : "text-white"} ${hasStrikethrough ? "line-through decoration-2" : ""}`}>{typedText}</span>
+        {/* 主标题 - 单行 */}
+        <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[100px] text-white leading-[1.1] mb-6 md:mb-8 text-center">
+          <span className="inline">
+            The{" "}
             <span 
-              className={`inline-block w-[3px] h-[0.85em] ml-1 align-top animate-blink ${isGreen ? "bg-paraflow-green" : "bg-white"}`}
-              style={{ marginTop: '0.1em' }}
-            />
-          </span>
-          <span className="block">Coding Agent</span>
-        </h1>
-      </div>
-
-      {/* 中间留白区域 - 减少150px提升首屏效率 */}
-      <div className="flex-1 min-h-0 md:min-h-[50px] lg:min-h-[150px]" />
-
-      {/* 底部内容区域 */}
-      <div className="relative z-10 w-full max-w-[1400px] mx-auto px-6 lg:px-8">
-
-        {/* 底部区域 */}
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 md:gap-8 pb-8 md:pb-12 lg:pb-16">
-          {/* 左侧描述 */}
-          <p className="text-gray-400 text-lg max-w-md leading-relaxed">
-            Vibe coding, with product definition and<br />
-            real engineering built in.
-          </p>
-
-          {/* 右侧按钮 */}
-          <div className="flex items-center gap-4">
-            <StarBorder
-              as="button"
-              color="white"
-              speed="4s"
-              className="cursor-pointer group"
+              className={`relative inline-block ${isGreenGradient ? "text-transparent bg-clip-text" : "text-white"}`}
+              style={isGreenGradient ? {
+                backgroundImage: "linear-gradient(90deg, #00c05c 0%, #79f200 100%)",
+              } : {}}
             >
-              <span className="flex items-center gap-2">
-                Start Building Now
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
-              </span>
-            </StarBorder>
+              {/* 绿色渐变划过动画层 */}
+              {showGradientSweep && (
+                <span 
+                  className="absolute inset-0 text-transparent bg-clip-text animate-gradient-sweep"
+                  style={{
+                    backgroundImage: "linear-gradient(90deg, #00c05c 0%, #79f200 100%)",
+                  }}
+                >
+                  {typedText}
+                </span>
+              )}
+              {renderTypedText()}
+            </span>
+            <span 
+              className="inline-block w-[3px] h-[0.85em] ml-1 align-top animate-blink"
+              style={{ 
+                marginTop: '0.1em',
+                background: isGreenGradient 
+                  ? "linear-gradient(180deg, #00c05c 0%, #79f200 100%)" 
+                  : "white"
+              }}
+            />
+            {" "}Coding Agent
+          </span>
+        </h1>
 
-            <button className="px-5 py-2.5 border border-white/20 text-white font-medium rounded-[10px] hover:border-paraflow-green/50 hover:text-paraflow-green transition-all duration-300 flex items-center gap-2 text-sm">
-              <Play className="w-4 h-4" />
-              Watch Video
-            </button>
-          </div>
+        {/* 副文案 - 居中 */}
+        <p className="text-gray-400 text-xl md:text-2xl lg:text-3xl text-center max-w-3xl mx-auto leading-relaxed mb-8 md:mb-12">
+          Vibe coding, with product definition and real engineering built in.
+        </p>
+
+        {/* 按钮 - 居中 */}
+        <div className="flex items-center justify-center gap-4 mt-[50px]">
+          <StarBorder
+            as="button"
+            color="white"
+            speed="4s"
+            className="cursor-pointer group w-[200px] justify-center"
+          >
+            <span className="flex items-center justify-center gap-2">
+              Start Building Now
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+            </span>
+          </StarBorder>
+
+          <button className="w-[200px] px-5 py-2.5 bg-black border border-white/20 text-white font-medium rounded-[10px] hover:border-paraflow-green/50 hover:text-paraflow-green transition-all duration-300 flex items-center justify-center gap-2 text-sm">
+            <Play className="w-4 h-4" />
+            Watch Video
+          </button>
         </div>
       </div>
-
 
       {/* CSS 动画定义 */}
       <style jsx>{`
@@ -327,6 +336,22 @@ export default function Hero() {
         }
         .animate-blink {
           animation: blink 1s step-end infinite;
+        }
+        @keyframes gradient-sweep {
+          0% {
+            clip-path: inset(0 100% 0 0);
+            opacity: 0.6;
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            clip-path: inset(0 0 0 0);
+            opacity: 1;
+          }
+        }
+        .animate-gradient-sweep {
+          animation: gradient-sweep 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
       `}</style>
     </section>
