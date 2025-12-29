@@ -33,6 +33,16 @@ export default function DoubleDiamondAscii() {
   const isHoveringRef = useRef<boolean>(false);
   const hoverStartTime = useRef<number>(0);
   const morphProgress = useRef<number>(0);
+  
+  // 鼠标跟随效果
+  const mousePos = useRef<{ x: number; y: number } | null>(null);
+  const mousePosSmooth = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const mouseRadius = 90; // 影响半径 90px (直径 180px)
+  
+  // 拖尾效果 - 存储历史位置
+  const mouseTrail = useRef<Array<{ x: number; y: number; time: number }>>([]);
+  const maxTrailLength = 15; // 拖尾长度
+  const trailFadeTime = 600; // 拖尾消散时间 (ms)
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -277,30 +287,54 @@ export default function DoubleDiamondAscii() {
       initParticles();
     });
 
-    // 检测是否为移动端（小于 768px）
-    const isMobile = () => window.innerWidth < 768;
-
-    const handleMouseEnter = () => {
-      // 移动端禁用 hover 效果
-      if (isMobile()) return;
-      isHoveringRef.current = true;
-      hoverStartTime.current = Date.now();
+    // 鼠标跟随效果
+    const heroSection = canvas.closest('section');
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      // 获取 canvas 容器的变换信息
+      const rect = canvas.getBoundingClientRect();
+      
+      // 鼠标相对于视口的位置
+      const clientX = e.clientX;
+      const clientY = e.clientY;
+      
+      // 计算 canvas 中心点
+      const rectCenterX = rect.left + rect.width / 2;
+      const rectCenterY = rect.top + rect.height / 2;
+      
+      // 鼠标相对于 canvas 中心的偏移
+      const offsetX = clientX - rectCenterX;
+      const offsetY = clientY - rectCenterY;
+      
+      // 反向应用 transform: rotate(-15deg) scale(1.3)
+      const scale = 1.3;
+      const angle = -15 * Math.PI / 180; // 反向旋转 +15deg
+      
+      // 先反向 scale
+      const scaledX = offsetX / scale;
+      const scaledY = offsetY / scale;
+      
+      // 再反向 rotate
+      const rotatedX = scaledX * Math.cos(-angle) - scaledY * Math.sin(-angle);
+      const rotatedY = scaledX * Math.sin(-angle) + scaledY * Math.cos(-angle);
+      
+      // 转换为 canvas 内部坐标（中心点 + 偏移）
+      mousePos.current = {
+        x: width / 2 + rotatedX,
+        y: height / 2 + rotatedY
+      };
     };
     
     const handleMouseLeave = () => {
-      isHoveringRef.current = false;
+      mousePos.current = null;
     };
-
-    canvas.addEventListener("mouseenter", handleMouseEnter);
-    canvas.addEventListener("mouseleave", handleMouseLeave);
     
-    // 移动端也监听 touch 事件但不触发汇聚效果
-    canvas.addEventListener("touchstart", () => {
-      if (isMobile()) return;
-      isHoveringRef.current = true;
-      hoverStartTime.current = Date.now();
-    });
-    canvas.addEventListener("touchend", handleMouseLeave);
+    if (heroSection) {
+      heroSection.addEventListener("mousemove", handleMouseMove);
+      heroSection.addEventListener("mouseleave", handleMouseLeave);
+    }
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("mouseleave", handleMouseLeave);
 
     let time = 0;
 
@@ -313,27 +347,86 @@ export default function DoubleDiamondAscii() {
       ctx.fillStyle = "rgba(0, 0, 0, 1)";
       ctx.fillRect(0, 0, width, height);
 
-      const now = Date.now();
-      const hoverDuration = 5000; // 5秒汇聚
+      // 静态效果，无 hover 汇聚
+      const progress = 0;
+      const easeProgress = 0;
       
-      // 更新汇聚进度
-      if (isHoveringRef.current) {
-        const elapsed = now - hoverStartTime.current;
-        const targetProgress = Math.min(1, elapsed / hoverDuration);
-        morphProgress.current += (targetProgress - morphProgress.current) * 0.03;
-      } else {
-        morphProgress.current *= 0.97;
+      // 平滑鼠标位置更新（快速响应）
+      const now = Date.now();
+      if (mousePos.current) {
+        const smoothFactor = 0.3; // 快速平滑
+        mousePosSmooth.current.x += (mousePos.current.x - mousePosSmooth.current.x) * smoothFactor;
+        mousePosSmooth.current.y += (mousePos.current.y - mousePosSmooth.current.y) * smoothFactor;
+        
+        // 更新拖尾 - 添加新位置
+        const lastTrail = mouseTrail.current[mouseTrail.current.length - 1];
+        if (!lastTrail || 
+            Math.abs(lastTrail.x - mousePosSmooth.current.x) > 5 || 
+            Math.abs(lastTrail.y - mousePosSmooth.current.y) > 5) {
+          mouseTrail.current.push({
+            x: mousePosSmooth.current.x,
+            y: mousePosSmooth.current.y,
+            time: now
+          });
+          if (mouseTrail.current.length > maxTrailLength) {
+            mouseTrail.current.shift();
+          }
+        }
       }
-
-      const progress = morphProgress.current;
-      const easeProgress = easeInOutCubic(progress);
+      
+      // 清理过期的拖尾
+      mouseTrail.current = mouseTrail.current.filter(t => now - t.time < trailFadeTime);
+      
+      // 计算粒子到鼠标的距离（包含拖尾），返回绿色强度 (0-1)
+      const getMouseGreenIntensity = (particleX: number, particleY: number): number => {
+        let maxIntensity = 0;
+        
+        // 当前鼠标位置的影响
+        if (mousePos.current) {
+          const dx = particleX - mousePosSmooth.current.x;
+          const dy = particleY - mousePosSmooth.current.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < mouseRadius) {
+            const intensity = Math.pow(1 - distance / mouseRadius, 1.2);
+            maxIntensity = Math.max(maxIntensity, intensity);
+          }
+        }
+        
+        // 拖尾位置的影响（逐渐减弱）
+        mouseTrail.current.forEach((trail, index) => {
+          const age = now - trail.time;
+          const ageFactor = 1 - age / trailFadeTime; // 时间衰减
+          const indexFactor = (index + 1) / mouseTrail.current.length; // 越新越强
+          const trailStrength = ageFactor * indexFactor * 0.7; // 拖尾强度上限 70%
+          
+          const dx = particleX - trail.x;
+          const dy = particleY - trail.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const trailRadius = mouseRadius * 0.8; // 拖尾半径稍小
+          
+          if (distance < trailRadius && trailStrength > 0) {
+            const intensity = Math.pow(1 - distance / trailRadius, 1.5) * trailStrength;
+            maxIntensity = Math.max(maxIntensity, intensity);
+          }
+        });
+        
+        return maxIntensity;
+      };
       
       // 绘制背景尘埃
       dustParticles.forEach((dust) => {
         const twinkle = Math.sin(time * dust.twinkleSpeed + dust.twinklePhase) * 0.3 + 0.7;
+        
+        // 鼠标跟随变色 - 非常鲜艳
+        const mouseIntensity = getMouseGreenIntensity(dust.x, dust.y);
+        const r = Math.floor(255 * (1 - mouseIntensity));
+        const g = Math.floor(255);
+        const b = Math.floor(255 * (1 - mouseIntensity * 0.85));
+        const opacity = dust.opacity * twinkle * (1 + mouseIntensity * 1.2);
+        
         ctx.beginPath();
-        ctx.arc(dust.x, dust.y, dust.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${dust.opacity * twinkle})`;
+        ctx.arc(dust.x, dust.y, dust.size * (1 + mouseIntensity * 0.8), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
         ctx.fill();
       });
 
@@ -403,31 +496,29 @@ export default function DoubleDiamondAscii() {
         const baseOpacity = layerOpacity + progress * 0.25;
         let opacity = Math.min(0.9, baseOpacity * twinkle);
         
-        // 颜色：汇聚的粒子从白到绿渐变，不汇聚的保持白色
-        let r, g, b;
-        if (shouldConverge) {
-          r = Math.floor(200 - progress * 200);
-          g = Math.floor(200 + progress * 55);
-          b = Math.floor(200 - progress * 80);
-        } else {
-          // 保持白色，hover 后透明度降至 50%
-          r = 220;
-          g = 220;
-          b = 220;
-          opacity = opacity * (1 - progress * 0.5); // hover 后降至 50%
-        }
+        // 鼠标跟随变色效果 - 更强烈
+        const mouseIntensity = getMouseGreenIntensity(particle.currentX, particle.currentY);
         
-        // 绘制粒子
+        // 基础白色，根据鼠标距离渐变到非常鲜艳的绿色
+        const r = Math.floor(220 * (1 - mouseIntensity));
+        const g = Math.floor(220 + mouseIntensity * 55);
+        const b = Math.floor(220 * (1 - mouseIntensity * 0.9));
+        
+        // 靠近鼠标时大幅增加亮度
+        const mouseBoost = mouseIntensity * 0.8;
+        opacity = Math.min(1, opacity * (1 + mouseBoost));
+        
+        // 绘制粒子 - 靠近时变大
         ctx.beginPath();
-        ctx.arc(particle.currentX, particle.currentY, size, 0, Math.PI * 2);
+        ctx.arc(particle.currentX, particle.currentY, size * (1 + mouseIntensity * 0.5), 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
         ctx.fill();
         
-        // 光晕效果 - 只对汇聚的粒子
-        if (shouldConverge && progress > 0.5 && particle.layer > 0) {
+        // 鼠标附近添加更明显的光晕
+        if (mouseIntensity > 0.15) {
           ctx.beginPath();
-          ctx.arc(particle.currentX, particle.currentY, size * 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(0, 200, 100, ${opacity * 0.15 * (progress - 0.5) * 2})`;
+          ctx.arc(particle.currentX, particle.currentY, size * 4, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0, 255, 100, ${(mouseIntensity - 0.15) * 0.4})`;
           ctx.fill();
         }
       });
@@ -475,18 +566,30 @@ export default function DoubleDiamondAscii() {
         const size = particle.baseSize * perspectiveScale * (0.8 + progress * 0.6);
         let opacity = (0.3 + progress * 0.5) * twinkle * perspectiveScale;
         
-        // 绘制核心粒子（无拖尾）
-        ctx.beginPath();
-        ctx.arc(particle.currentX, particle.currentY, size, 0, Math.PI * 2);
+        // 鼠标跟随变色效果 - 非常鲜艳
+        const mouseIntensity = getMouseGreenIntensity(particle.currentX, particle.currentY);
         
-        // 汇聚的粒子变绿，不汇聚的保持白色且透明度降低
-        if (shouldConverge && progress > 0.2) {
-          ctx.fillStyle = `rgba(100, 255, 180, ${opacity})`;
-        } else {
-          opacity = opacity * (1 - progress * 0.5); // hover 后降至 50%
-          ctx.fillStyle = `rgba(220, 220, 220, ${opacity})`;
-        }
+        // 基础白色，根据鼠标距离渐变到非常鲜艳绿色
+        const r = Math.floor(220 * (1 - mouseIntensity));
+        const g = Math.floor(220 + mouseIntensity * 55);
+        const b = Math.floor(220 * (1 - mouseIntensity * 0.85));
+        
+        // 靠近鼠标时大幅增加亮度
+        opacity = opacity * (1 + mouseIntensity * 1.0);
+        
+        // 绘制核心粒子（无拖尾）- 靠近时变大
+        ctx.beginPath();
+        ctx.arc(particle.currentX, particle.currentY, size * (1 + mouseIntensity * 0.6), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
         ctx.fill();
+        
+        // 鼠标附近添加更明显光晕
+        if (mouseIntensity > 0.2) {
+          ctx.beginPath();
+          ctx.arc(particle.currentX, particle.currentY, size * 4, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0, 255, 100, ${(mouseIntensity - 0.2) * 0.45})`;
+          ctx.fill();
+        }
         
       });
 
@@ -543,9 +646,9 @@ export default function DoubleDiamondAscii() {
           const t = (i / highlightCount + time * 0.00006) % 1;
           const point = getDoubleDiamondPoint(t, 0);
           
-          const pulse = Math.sin(time * 0.002 + i * 0.6) * 0.3 + 0.7;
-          const size = 0.3 + pulse * 0.25;
-          const opacity = highlightProgress * 0.4 * pulse;
+          const pulseVal = Math.sin(time * 0.002 + i * 0.6) * 0.3 + 0.7;
+          const size = 0.3 + pulseVal * 0.25;
+          const opacity = highlightProgress * 0.4 * pulseVal;
           
           ctx.beginPath();
           ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
@@ -554,7 +657,6 @@ export default function DoubleDiamondAscii() {
         }
       }
       
-
       time += 16;
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -563,8 +665,12 @@ export default function DoubleDiamondAscii() {
 
     return () => {
       window.removeEventListener("resize", resize);
-      canvas.removeEventListener("mouseenter", handleMouseEnter);
+      canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
+      if (heroSection) {
+        heroSection.removeEventListener("mousemove", handleMouseMove);
+        heroSection.removeEventListener("mouseleave", handleMouseLeave);
+      }
       cancelAnimationFrame(animationRef.current);
     };
   }, []);

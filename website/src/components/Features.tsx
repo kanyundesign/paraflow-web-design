@@ -314,8 +314,8 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
       <div className={`relative px-6 lg:px-8 transition-all duration-500 ${
           isExpanded ? "py-6" : "py-8"
         }`}>
-        {/* 左侧竖向装饰线 - 在数字与图标的居中位置（移动端隐藏） */}
-        <div className="hidden md:block absolute left-[71px] lg:left-[79px] top-0 bottom-0 w-px bg-white/40" />
+        {/* 左侧竖向装饰线（移动端隐藏） */}
+        <div className="hidden md:block absolute left-[50px] lg:left-[58px] top-0 bottom-0 w-px bg-white/40" />
         
         {/* 中间竖向装饰线 - 在左右两列之间 */}
         <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-white/40" />
@@ -325,9 +325,9 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
           <div 
             className="hidden lg:block absolute h-px bg-white/40"
             style={{ 
-              left: '79px',
+              left: '58px',
               right: '50%',
-              top: index === 0 ? '270px' : index === 1 ? '270px' : index === 2 ? '280px' : '270px'
+              top: index === 0 ? '280px' : index === 1 ? '315px' : index === 2 ? '285px' : '275px'
             }}
           >
             {/* 装饰方块 - 左端 */}
@@ -340,39 +340,21 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
           {/* 左侧：标题 + 描述 + 标签 */}
           <div>
             {/* 标题行 */}
-            <div className={`flex items-start gap-4 md:gap-6 transition-all duration-500 ${
+            <div className={`flex items-baseline gap-8 transition-all duration-500 ${
               isExpanded ? "mt-0 md:-mt-[60px] mb-6 md:mb-12" : "mt-0 mb-0"
             }`}>
-              <span className={`font-mono text-lg sm:text-xl md:text-2xl lg:text-3xl transition-colors duration-500 ${
-                isExpanded 
-                  ? index === 0 ? "text-paraflow-green" : index === 1 ? "text-purple-400" : index === 2 ? "text-blue-400" : "text-rose-400"
-                  : "text-gray-700"
-              }`}>
+              <span 
+                className={`font-mono text-xl sm:text-2xl md:text-3xl lg:text-4xl transition-colors duration-500 ${
+                  isExpanded 
+                    ? index === 0 ? "text-paraflow-green" : index === 1 ? "text-purple-400" : index === 2 ? "text-blue-400" : "text-rose-400"
+                    : "text-gray-700"
+                }`}
+                style={{ transform: 'translateX(-30px)' }}
+              >
                 {String(index + 1).padStart(2, "0")}
               </span>
               
-              <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-500 ${
-                isExpanded 
-                  ? index === 0 
-                    ? "bg-paraflow-green/20 border border-paraflow-green/30" 
-                    : index === 1 
-                      ? "bg-purple-400/20 border border-purple-400/30"
-                      : index === 2 
-                        ? "bg-blue-400/20 border border-blue-400/30"
-                        : "bg-rose-400/20 border border-rose-400/30"
-                  : "bg-white/5 border border-white/20"
-              }`}>
-                {/* 根据展开状态动态渲染不同颜色的 icon */}
-                <div className={`transition-colors duration-500 ${
-                  isExpanded 
-                    ? "" 
-                    : "[&>svg]:text-gray-600"
-                }`}>
-                  {module.icon}
-                </div>
-              </div>
-              
-              <h3 className={`font-display text-[20px] sm:text-[24px] md:text-[30px] lg:text-[36px] transition-colors duration-500 leading-tight ${
+              <h3 className={`font-display text-[24px] sm:text-[30px] md:text-[38px] lg:text-[46px] transition-colors duration-500 leading-tight ${
                 isExpanded ? "text-white" : "text-gray-600"
               }`}>
                 {module.title.includes('\n') ? (
@@ -401,7 +383,7 @@ function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
               <div className="overflow-hidden">
                 <div className="flex gap-6">
                   {/* 占位：序号宽度 */}
-                  <div className="hidden lg:block w-[40px] flex-shrink-0" />
+                  <div className="hidden lg:block w-[50px] flex-shrink-0" />
                   
                   <div>
                     <p className={`text-white/30 leading-relaxed mb-6 max-w-lg transition-all duration-500 ${
@@ -749,8 +731,8 @@ export default function Features() {
             <div key={index} className="relative border-t border-white/20">
               {/* 模块头部 */}
               <div className="px-6 pt-8 pb-6">
-                <div className="flex items-start gap-4 mb-4">
-                  <span className={`font-mono text-xl ${
+                <div className="flex items-baseline gap-6 mb-4">
+                  <span className={`font-mono text-2xl ${
                     index === 0 ? "text-paraflow-green" : 
                     index === 1 ? "text-purple-400" : 
                     index === 2 ? "text-blue-400" : 
@@ -759,16 +741,7 @@ export default function Features() {
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                    index === 0 ? "bg-paraflow-green/20 border border-paraflow-green/30" : 
-                    index === 1 ? "bg-purple-400/20 border border-purple-400/30" : 
-                    index === 2 ? "bg-blue-400/20 border border-blue-400/30" : 
-                    "bg-rose-400/20 border border-rose-400/30"
-                  }`}>
-                    {module.icon}
-                  </div>
-                  
-                  <h3 className="font-display text-xl text-white leading-tight flex-1">
+                  <h3 className="font-display text-2xl text-white leading-tight flex-1">
                     {module.title.includes('\n') ? (
                       <>
                         {module.title.split('\n')[0]}

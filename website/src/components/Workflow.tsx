@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link2, Palette, Code2 } from "lucide-react";
 import StarBackground from "./StarBackground";
+import StarIcon from "./StarIcon";
 
 interface WorkflowStep {
   number: string;
@@ -10,14 +11,15 @@ interface WorkflowStep {
   subtitle: string;
   description: string;
   icon: React.ReactNode;
+  iconType: 'link' | 'palette' | 'code';
+  image?: string;
+  tag: string;
 }
 
 export default function Workflow() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
-  const pauseTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const steps: WorkflowStep[] = [
     {
@@ -26,6 +28,9 @@ export default function Workflow() {
       subtitle: "Think & Plan",
       description: "Create PRDs and User Flows that act as the logical backbone. Structure your ideas into actionable specifications.",
       icon: <Link2 className="w-7 h-7 text-paraflow-green" />,
+      iconType: "link",
+      image: "/workflow-01.jpg",
+      tag: "Define",
     },
     {
       number: "02",
@@ -33,6 +38,9 @@ export default function Workflow() {
       subtitle: "Generate High-Taste UIs",
       description: "Generate high-taste UIs with an editable design system that ensures consistency across all your interfaces.",
       icon: <Palette className="w-7 h-7 text-paraflow-green" />,
+      iconType: "palette",
+      image: "/workflow-02.jpg",
+      tag: "Design",
     },
     {
       number: "03",
@@ -40,6 +48,9 @@ export default function Workflow() {
       subtitle: "Ship Instantly",
       description: "With production-ready databases and APIs, ship your apps instantly. From prototype to production in one flow.",
       icon: <Code2 className="w-7 h-7 text-paraflow-green" />,
+      iconType: "code",
+      image: "/workflow-03.jpg",
+      tag: "Develop",
     },
   ];
 
@@ -60,104 +71,6 @@ export default function Workflow() {
 
     return () => observer.disconnect();
   }, []);
-
-  // 自动轮播 - 1 → 2 → 3 → 2 → 1 → 2 → 3 ... 来回递进
-  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
-  
-  useEffect(() => {
-    if (!isVisible || isPaused) return;
-    
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => {
-        if (direction === 'forward') {
-          if (prev >= steps.length - 1) {
-            setDirection('backward');
-            return prev - 1;
-          }
-          return prev + 1;
-        } else {
-          if (prev <= 0) {
-            setDirection('forward');
-            return prev + 1;
-          }
-          return prev - 1;
-        }
-      });
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [isVisible, isPaused, steps.length, direction]);
-
-  // 处理用户点击 - 逐步过渡动画（2倍速经过中间卡片）
-  const handleCardClick = (targetIndex: number) => {
-    if (targetIndex === activeIndex) return;
-    
-    setIsPaused(true);
-    
-    // 清除之前的定时器
-    if (pauseTimeoutRef.current) {
-      clearTimeout(pauseTimeoutRef.current);
-    }
-    
-    const diff = targetIndex - activeIndex;
-    const step = diff > 0 ? 1 : -1;
-    const stepsCount = Math.abs(diff);
-    
-    // 如果距离超过1，逐步过渡（2倍速：600ms 间隔，能看到中间卡片的过渡）
-    if (stepsCount > 1) {
-      let currentStep = 0;
-      const animateStep = () => {
-        currentStep++;
-        setActiveIndex(prev => prev + step);
-        if (currentStep < stepsCount) {
-          setTimeout(animateStep, 600); // 2倍速：600ms 间隔，让动画顺滑可见
-        }
-      };
-      animateStep();
-    } else {
-      setActiveIndex(targetIndex);
-    }
-    
-    // 5秒后恢复自动切换
-    pauseTimeoutRef.current = setTimeout(() => {
-      setIsPaused(false);
-    }, 5000);
-  };
-
-  // 清理定时器
-  useEffect(() => {
-    return () => {
-      if (pauseTimeoutRef.current) {
-        clearTimeout(pauseTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  // 计算每张卡片的位置和样式 - 环绕视角效果
-  const getCardStyle = (index: number) => {
-    const diff = index - activeIndex;
-    // 处理循环
-    let position = diff;
-    if (diff > 1) position = diff - 3;
-    if (diff < -1) position = diff + 3;
-
-    const isCenter = position === 0;
-    const isLeft = position === -1;
-    const isRight = position === 1;
-
-    // 中间卡片正对，两侧卡片带透视旋转营造环绕效果
-    return {
-      transform: isCenter 
-        ? "translateX(0) scale(1) perspective(1000px) rotateY(0deg)" 
-        : isLeft 
-          ? "translateX(-75%) scale(0.85) perspective(1000px) rotateY(25deg)" 
-          : isRight 
-            ? "translateX(75%) scale(0.85) perspective(1000px) rotateY(-25deg)"
-            : "translateX(0) scale(0.7) perspective(1000px) rotateY(0deg)",
-      opacity: isCenter ? 1 : 0.5,
-      zIndex: isCenter ? 10 : 5,
-      filter: isCenter ? 'none' : 'brightness(0.8)',
-    };
-  };
 
   return (
     <section ref={sectionRef} className="relative bg-black pt-20 pb-32 overflow-hidden">
@@ -218,95 +131,75 @@ export default function Workflow() {
             }}
           />
 
-        {/* 旋转木马卡片区域 */}
-        <div className={`relative h-[450px] md:h-[400px] transition-all duration-1000 ${
-          isVisible ? "opacity-100" : "opacity-0"
+        {/* 卡片横向并列区域 */}
+        <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 transition-all duration-1000 ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}>
-          {/* 卡片容器 */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            {steps.map((step, index) => {
-              const style = getCardStyle(index);
-              return (
-                <div
-                  key={index}
-                  className="absolute w-full max-w-[420px] transition-all duration-1000 ease-[cubic-bezier(0.25,0.1,0.25,1)] cursor-pointer"
-                  style={{
-                    transform: style.transform,
-                    opacity: style.opacity,
-                    zIndex: style.zIndex,
-                    filter: style.filter,
-                  }}
-                  onClick={() => handleCardClick(index)}
-                >
-                  {/* 卡片主体 */}
-                  <div className={`group relative h-full border rounded-3xl p-8 overflow-hidden transition-all duration-500 ${
-                    activeIndex === index 
-                      ? "bg-black border-paraflow-green shadow-[0_0_40px_rgba(0,192,92,0.1)]" 
-                      : "bg-black/80 border-white/20 hover:border-white/40 hover:bg-black hover:scale-[1.02]"
-                  }`}>
-                    {/* 背景光效 */}
-                    {activeIndex === index && (
-                      <div className="absolute inset-0">
-                        <div 
-                          className="absolute top-0 right-0 w-64 h-64 rounded-full"
-                          style={{
-                            background: "radial-gradient(circle, rgba(0, 192, 92, 0.15) 0%, transparent 70%)",
-                            filter: "blur(40px)",
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* 步骤编号 */}
-                    <div className="relative z-10 flex items-center gap-3 mb-6">
-                      <span className="text-paraflow-green font-mono text-sm tracking-wider">
-                        /{step.number}
-                      </span>
-                      <span className="text-white font-medium text-lg">
-                        {step.title}
-                      </span>
-                    </div>
-                    
-                    {/* 图标 */}
-                    <div className={`relative z-10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 ${
-                      activeIndex === index 
-                        ? "bg-paraflow-green/20 border border-paraflow-green/30 scale-110" 
-                        : "bg-paraflow-green/10 border border-paraflow-green/20"
-                    }`}>
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              className="group relative bg-black border border-white/40 rounded-2xl overflow-hidden hover:border-paraflow-green transition-all duration-500 cursor-pointer"
+              style={{ transitionDelay: `${index * 100}ms` }}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              {/* 配图区域 */}
+              <div className="aspect-video bg-gradient-to-br from-paraflow-green/5 via-black to-paraflow-green-light/5 overflow-hidden relative">
+                {step.image ? (
+                  <>
+                    <img 
+                      src={step.image} 
+                      alt={step.title}
+                      className="w-full h-full object-cover transition-all duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                      style={{ transform: 'scale(1.2)' }}
+                    />
+                    {/* 20% 黑色蒙层 - hover 时消失 */}
+                    <div className="absolute inset-0 bg-black/20 transition-opacity duration-500 group-hover:opacity-0" />
+                  </>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-paraflow-green/10 border border-paraflow-green/20">
                       {step.icon}
                     </div>
-                    
-                    {/* 副标题 */}
-                    <h4 className="relative z-10 text-white text-xl font-medium mb-3 transition-colors duration-300 group-hover:text-paraflow-green">
-                      {step.subtitle}
-                    </h4>
-                    
-                    {/* 描述 */}
-                    <p className="relative z-10 text-gray-500 text-sm leading-relaxed">
-                      {step.description}
-                    </p>
-                    
-                    {/* 底部装饰线 */}
-                    <div className="absolute bottom-0 left-8 right-8 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                   </div>
+                )}
+              </div>
+              
+              {/* 内容区域 - hover 时向上移动覆盖图片 */}
+              <div className="relative bg-black transition-transform duration-500 ease-out group-hover:-translate-y-10">
+                {/* 装饰分割线 */}
+                <div className="border-t border-white/40" />
+                
+                <div className="px-4 pt-8 pb-2 relative">
+                  {/* 右侧星点构成的 icon */}
+                  <div className="absolute right-4 top-1/2" style={{ transform: 'translateY(calc(-50% - 20px))' }}>
+                    <StarIcon 
+                      icon={step.iconType}
+                      size={60}
+                      color="rgba(255, 255, 255, 0.05)"
+                      hoverColor="rgba(0, 192, 92, 0.35)"
+                      isHovered={hoveredIndex === index}
+                    />
+                  </div>
+                  
+                  {/* 标签 */}
+                  <div className="inline-flex items-center px-2 py-0.5 bg-white/5 border border-white/20 rounded-full text-xs text-white font-medium tracking-wider mb-3 group-hover:bg-paraflow-green/10 group-hover:border-paraflow-green/30 group-hover:text-paraflow-green transition-all duration-300">
+                    {step.tag}
+                  </div>
+                  
+                  {/* 标题 */}
+                  <h4 className="text-white text-xl font-medium group-hover:text-paraflow-green transition-colors duration-300">
+                    {step.subtitle}
+                  </h4>
+                  
+                  {/* 描述 - hover 时显示 */}
+                  <p className="text-gray-400 text-sm leading-relaxed mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 line-clamp-2">
+                    {step.description}
+                  </p>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* 进度指示器 - 直线 */}
-        <div className="flex justify-center gap-3 mt-8">
-          {steps.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => handleCardClick(index)}
-              className={`h-0.5 rounded-full transition-all duration-700 ease-out ${
-                activeIndex === index 
-                  ? "w-12 bg-paraflow-green shadow-[0_0_10px_rgba(0,192,92,0.5)]" 
-                  : "w-6 bg-white/20 hover:bg-white/30"
-              }`}
-            />
+              </div>
+              
+            </div>
           ))}
         </div>
       </div>

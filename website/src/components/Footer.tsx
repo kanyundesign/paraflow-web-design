@@ -92,22 +92,22 @@ export default function Footer() {
         {/* 主要内容区 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           {/* Logo 和描述 */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 self-end">
             <div className="flex items-center gap-3 mb-4">
               <Image
-                src="/logo-dark.svg"
+                src="/icon.svg"
                 alt="Paraflow"
-                width={120}
-                height={24}
-                className="h-5 w-auto"
+                width={40}
+                height={40}
+                className="h-10 w-10"
               />
             </div>
             <p className="text-gray-500 text-sm leading-relaxed max-w-xs mb-6">
               The infinite canvas for building real software. From idea to production in one flow.
             </p>
             
-            {/* 社交媒体链接 - 移到这里 */}
-            <div className="flex items-center gap-3 mb-20">
+            {/* 社交媒体链接 */}
+            <div className="flex items-center gap-3">
               {socialLinks.map((social, index) => (
                 <a
                   key={index}
@@ -119,11 +119,6 @@ export default function Footer() {
                 </a>
               ))}
             </div>
-            
-            {/* 版权信息 */}
-            <p className="text-gray-600 text-xs">
-              © 2024 Paraflow Inc. All rights reserved.
-            </p>
           </div>
 
           {/* 链接组 */}
@@ -131,26 +126,15 @@ export default function Footer() {
             <FooterLinkGroup key={index} {...group} />
           ))}
         </div>
-
-
-        {/* 大型品牌文字 */}
-        <div className="mt-16 -mb-4 overflow-hidden flex justify-center">
-          <div 
-            className="w-[90vw] select-none"
-            style={{
-              maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.13) 0%, rgba(0,0,0,0.065) 40%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,0.13) 0%, rgba(0,0,0,0.065) 40%, transparent 100%)",
-            }}
-          >
-            <Image
-              src="/paraflow-text.svg"
-              alt="Paraflow"
-              width={2000}
-              height={400}
-              className="w-full h-auto"
-            />
-          </div>
+        
+        {/* 版权信息 */}
+        <div className="border-t border-white/10 pt-6">
+          <p className="text-gray-600 text-xs">
+            © 2024 Paraflow Inc. All rights reserved.
+          </p>
         </div>
+
+
       </div>
     </footer>
   );

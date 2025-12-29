@@ -5,6 +5,7 @@ import { ArrowRight, Play } from "lucide-react";
 import StarBorder from "./StarBorder";
 import Image from "next/image";
 import DoubleDiamondAscii from "./DoubleDiamondAscii";
+import GradientText from "./GradientText";
 
 export default function Hero() {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -12,6 +13,8 @@ export default function Hero() {
   const [selectedRange, setSelectedRange] = useState<{ start: number; end: number } | null>(null); // 选中高亮范围
   const [isGreenGradient, setIsGreenGradient] = useState(false); // 绿色渐变效果
   const [showGradientSweep, setShowGradientSweep] = useState(false); // 绿色渐变划过动画
+  const [isAnimationComplete, setIsAnimationComplete] = useState(false); // 动画完成状态
+  const [hideCursor, setHideCursor] = useState(false); // 隐藏光标
 
   useEffect(() => {
     const content = contentRef.current;
@@ -44,11 +47,11 @@ export default function Hero() {
       { text: "Vis", delay: 100 },
       { text: "Visu", delay: 100 },
       { text: "Visua", delay: 100 },
-      { text: "Visual", delay: 100 },
-      { text: "Visual", delay: 500 }, // 暂停
-      { text: "Visual", delay: 100, startGradientSweep: true }, // 开始绿色渐变划过
-      { text: "Visual", delay: 1000 }, // 等待动画完成
-      { text: "Visual", delay: 100, applyGreenGradient: true }, // 应用最终绿色渐变
+      { text: "Visual", delay: 100, hideCursor: true }, // 光标消失
+      { text: "Visual", delay: 1000 }, // 停顿 1 秒
+      { text: "Visual", delay: 100, startGradientSweep: true }, // 渐变色从左向右滑动
+      { text: "Visual", delay: 800 }, // 等待滑动动画
+      { text: "Visual", delay: 100, applyGreenGradient: true }, // 应用最终渐变
       // 最终状态 - 不再继续
     ];
 
@@ -69,6 +72,11 @@ export default function Hero() {
         setSelectedRange(null);
       }
       
+      // 处理光标隐藏
+      if (step.hideCursor) {
+        setHideCursor(true);
+      }
+      
       // 处理绿色渐变动画
       if (step.startGradientSweep) {
         setShowGradientSweep(true);
@@ -76,6 +84,10 @@ export default function Hero() {
       if (step.applyGreenGradient) {
         setShowGradientSweep(false);
         setIsGreenGradient(true);
+        // 启用 GradientText 流动效果
+        setTimeout(() => {
+          setIsAnimationComplete(true);
+        }, 800); // 等待渐变划过动画完成
       }
       
       setTypedText(step.text);
@@ -248,35 +260,56 @@ export default function Hero() {
         <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-[100px] text-white leading-[1.1] mb-6 md:mb-8 text-center">
           <span className="inline">
             The{" "}
-            <span 
-              className={`relative inline-block ${isGreenGradient ? "text-transparent bg-clip-text" : "text-white"}`}
-              style={isGreenGradient ? {
-                backgroundImage: "linear-gradient(90deg, #00c05c 0%, #79f200 100%)",
-              } : {}}
-            >
-              {/* 绿色渐变划过动画层 */}
-              {showGradientSweep && (
+            {isAnimationComplete ? (
+              // 动画完成后，使用流动渐变效果
+              <GradientText 
+                colors={["#00c05c", "#79f200", "#00ff80", "#79f200", "#00c05c"]}
+                animationSpeed={10}
+                className="font-display"
+              >
+                Visual Coding
+              </GradientText>
+            ) : (
+              // 打字机动画进行中
+              <>
                 <span 
-                  className="absolute inset-0 text-transparent bg-clip-text animate-gradient-sweep"
-                  style={{
+                  className={`relative inline-block transition-all duration-1000 ease-out ${
+                    isGreenGradient 
+                      ? "text-transparent bg-clip-text" 
+                      : showGradientSweep 
+                        ? "text-transparent bg-clip-text" 
+                        : "text-white"
+                  }`}
+                  style={(isGreenGradient || showGradientSweep) ? {
                     backgroundImage: "linear-gradient(90deg, #00c05c 0%, #79f200 100%)",
-                  }}
+                  } : {}}
                 >
-                  {typedText}
+                  {renderTypedText()}
                 </span>
-              )}
-              {renderTypedText()}
-            </span>
-            <span 
-              className="inline-block w-[3px] h-[0.85em] ml-1 align-top animate-blink"
-              style={{ 
-                marginTop: '0.1em',
-                background: isGreenGradient 
-                  ? "linear-gradient(180deg, #00c05c 0%, #79f200 100%)" 
-                  : "white"
-              }}
-            />
-            {" "}Coding Agent
+                {!hideCursor && (
+                  <span 
+                    className="inline-block w-[3px] h-[0.85em] ml-1 align-top animate-blink"
+                    style={{ 
+                      marginTop: '0.1em',
+                      background: "white"
+                    }}
+                  />
+                )}
+                <span 
+                  className={`transition-all duration-1000 ease-out ${
+                    (isGreenGradient || showGradientSweep) 
+                      ? "text-transparent bg-clip-text" 
+                      : "text-white"
+                  }`}
+                  style={(isGreenGradient || showGradientSweep) ? {
+                    backgroundImage: "linear-gradient(90deg, #79f200 0%, #00ff80 100%)",
+                  } : {}}
+                >
+                  {" "}Coding
+                </span>
+              </>
+            )}
+            {" "}Agent
           </span>
         </h1>
 
