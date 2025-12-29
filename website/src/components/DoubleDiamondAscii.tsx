@@ -225,12 +225,12 @@ export default function DoubleDiamondAscii() {
           currentY: galaxyPoint.y,
           baseSize: 0.35 + layer * 0.18,
           twinklePhase: Math.random() * Math.PI * 2,
-          twinkleSpeed: 0.001 + Math.random() * 0.002,
+          twinkleSpeed: 0.003 + Math.random() * 0.005, // 增强闪烁速度
           driftPhaseX: Math.random() * Math.PI * 2,
           driftPhaseY: Math.random() * Math.PI * 2,
-          driftSpeed: 0.0002 + Math.random() * 0.0003,
-          driftAmplitude: 2 + Math.random() * 4,
-          flowSpeed: 0.00005 + Math.random() * 0.0001,
+          driftSpeed: 0.0004 + Math.random() * 0.0006, // 增强漂移速度
+          driftAmplitude: 3 + Math.random() * 5, // 增强漂移幅度
+          flowSpeed: 0.00008 + Math.random() * 0.00015,
           layer,
           trailLength: 3 + Math.random() * 5,
         });
@@ -255,12 +255,12 @@ export default function DoubleDiamondAscii() {
           currentY: galaxyPoint.y,
           baseSize: 0.4,
           twinklePhase: Math.random() * Math.PI * 2,
-          twinkleSpeed: 0.002 + Math.random() * 0.003,
+          twinkleSpeed: 0.004 + Math.random() * 0.006, // 增强闪烁速度
           driftPhaseX: Math.random() * Math.PI * 2,
           driftPhaseY: Math.random() * Math.PI * 2,
-          driftSpeed: 0.0001 + Math.random() * 0.0002,
-          driftAmplitude: 1 + Math.random() * 2,
-          flowSpeed: 0.00008 + Math.random() * 0.00012,
+          driftSpeed: 0.0003 + Math.random() * 0.0004, // 增强漂移速度
+          driftAmplitude: 2 + Math.random() * 3, // 增强漂移幅度
+          flowSpeed: 0.00012 + Math.random() * 0.00018,
           layer: 2,
           trailLength: 8 + Math.random() * 12,
         });
@@ -274,7 +274,7 @@ export default function DoubleDiamondAscii() {
           size: 0.4 + Math.random() * 0.6,
           opacity: 0.15 + Math.random() * 0.2,
           twinklePhase: Math.random() * Math.PI * 2,
-          twinkleSpeed: 0.0005 + Math.random() * 0.001,
+          twinkleSpeed: 0.0015 + Math.random() * 0.003, // 增强闪烁速度
         });
       }
     };
@@ -444,8 +444,8 @@ export default function DoubleDiamondAscii() {
         ctx.fillRect(0, 0, width, height);
       }
       
-      // 静态时的星系旋转角度 - 顺时针从内向外扩散
-      const galaxyRotation = time * 0.00005;
+      // 静态时的星系旋转角度 - 顺时针从内向外扩散（增强速度）
+      const galaxyRotation = time * 0.00012;
 
       // 绘制星云粒子
       nebulaParticles.forEach((particle, idx) => {
