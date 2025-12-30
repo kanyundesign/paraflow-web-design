@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link2, Palette, Code2 } from "lucide-react";
 import StarBackground from "./StarBackground";
-import StarIcon from "./StarIcon";
+import ConstellationIcon from "./ConstellationIcon";
 
 interface WorkflowStep {
   number: string;
@@ -171,29 +171,28 @@ export default function Workflow() {
                 <div className="border-t border-white/40" />
                 
                 <div className="px-4 pt-8 pb-2 relative">
-                  {/* 右侧星点构成的 icon */}
-                  <div className="absolute right-4 top-1/2" style={{ transform: 'translateY(calc(-50% - 20px))' }}>
-                    <StarIcon 
-                      icon={step.iconType}
-                      size={60}
-                      color="rgba(255, 255, 255, 0.05)"
-                      hoverColor="rgba(0, 192, 92, 0.35)"
+                  {/* 星座连线效果 - 覆盖整个内容区域 */}
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    <ConstellationIcon
+                      iconType={step.iconType}
                       isHovered={hoveredIndex === index}
+                      staticColor="rgba(255, 255, 255, 0.15)"
+                      hoverColor="rgba(0, 192, 92, 1)"
                     />
                   </div>
                   
                   {/* 标签 */}
-                  <div className="inline-flex items-center px-2 py-0.5 bg-white/5 border border-white/20 rounded-full text-xs text-white font-medium tracking-wider mb-3 group-hover:bg-paraflow-green/10 group-hover:border-paraflow-green/30 group-hover:text-paraflow-green transition-all duration-300">
+                  <div className="relative z-10 inline-flex items-center px-2 py-0.5 bg-white/5 border border-white/20 rounded-full text-xs text-white font-medium tracking-wider mb-3 group-hover:bg-paraflow-green/10 group-hover:border-paraflow-green/30 group-hover:text-paraflow-green transition-all duration-300">
                     {step.tag}
                   </div>
                   
                   {/* 标题 */}
-                  <h4 className="text-white text-xl font-medium group-hover:text-paraflow-green transition-colors duration-300">
+                  <h4 className="relative z-10 text-white text-xl font-medium group-hover:text-paraflow-green transition-colors duration-300">
                     {step.subtitle}
                   </h4>
                   
                   {/* 描述 - hover 时显示 */}
-                  <p className="text-gray-400 text-sm leading-relaxed mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 line-clamp-2">
+                  <p className="relative z-10 text-gray-400 text-sm leading-relaxed mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 line-clamp-2">
                     {step.description}
                   </p>
                 </div>
