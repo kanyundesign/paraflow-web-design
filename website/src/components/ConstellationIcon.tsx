@@ -9,6 +9,10 @@ interface ConstellationIconProps {
   hoverColor?: string;
   // 静态模式：'scattered' = 完全分散（Workflow用）, 'outline' = 形成轮廓, 'flowing' = 持续流动
   staticMode?: 'scattered' | 'outline' | 'flowing';
+  // icon 位置偏移（正数向下，负数向上）
+  iconOffsetY?: number;
+  // icon 缩放比例（默认 1.0，0.8 表示缩小 20%）
+  iconScaleMultiplier?: number;
 }
 
 interface Star {
@@ -37,6 +41,8 @@ const ConstellationIcon: React.FC<ConstellationIconProps> = ({
   staticColor = 'rgba(255, 255, 255, 0.4)',
   hoverColor = 'rgba(0, 192, 92, 0.8)',
   staticMode = 'scattered',
+  iconOffsetY = 0,
+  iconScaleMultiplier = 1.0,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -78,7 +84,9 @@ const ConstellationIcon: React.FC<ConstellationIconProps> = ({
     } else {
       iconCenterY = height * 0.5 - 20;
     }
-    const iconScale = Math.min(width * 0.4, height * 0.8) * 0.6;
+    // 应用额外的 Y 偏移
+    iconCenterY += iconOffsetY;
+    const iconScale = Math.min(width * 0.4, height * 0.8) * 0.6 * iconScaleMultiplier;
     
     let targetPoints: { x: number; y: number }[] = [];
     let connections: number[][] = [];
@@ -176,64 +184,79 @@ const ConstellationIcon: React.FC<ConstellationIconProps> = ({
         [6, 7], [7, 8], // 斜杠
       ];
     } else if (iconType === 'rocket') {
-      // 火箭 icon 🚀 - 重新设计为上升的火箭轨迹
-      const rocketH = iconScale * 0.5;
-      const rocketW = iconScale * 0.25;
+      // 火箭 icon 🚀 - 45°倾斜向右上方飞行的经典火箭
+      const size = iconScale * 0.5;
+      const angle = -Math.PI / 4; // -45度（向右上）
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
       
-      // 火箭主体点
+      // 旋转辅助函数
+      const rotate = (x: number, y: number) => ({
+        x: iconCenterX + x * cos - y * sin,
+        y: iconCenterY + x * sin + y * cos
+      });
+      
+      // 基于中心点的相对坐标，然后旋转
       targetPoints = [
-        // 火箭尖顶
-        { x: iconCenterX, y: iconCenterY - rocketH }, // 0: 顶点
-        // 火箭主体左侧曲线
-        { x: iconCenterX - rocketW * 0.6, y: iconCenterY - rocketH * 0.7 }, // 1
-        { x: iconCenterX - rocketW, y: iconCenterY - rocketH * 0.3 }, // 2
-        { x: iconCenterX - rocketW * 0.9, y: iconCenterY + rocketH * 0.1 }, // 3
-        { x: iconCenterX - rocketW * 0.7, y: iconCenterY + rocketH * 0.4 }, // 4
-        // 火箭主体右侧曲线
-        { x: iconCenterX + rocketW * 0.6, y: iconCenterY - rocketH * 0.7 }, // 5
-        { x: iconCenterX + rocketW, y: iconCenterY - rocketH * 0.3 }, // 6
-        { x: iconCenterX + rocketW * 0.9, y: iconCenterY + rocketH * 0.1 }, // 7
-        { x: iconCenterX + rocketW * 0.7, y: iconCenterY + rocketH * 0.4 }, // 8
-        // 尾焰曲线 - 左
-        { x: iconCenterX - rocketW * 0.5, y: iconCenterY + rocketH * 0.5 }, // 9
-        { x: iconCenterX - rocketW * 0.6, y: iconCenterY + rocketH * 0.7 }, // 10
-        { x: iconCenterX - rocketW * 0.4, y: iconCenterY + rocketH * 0.9 }, // 11
-        { x: iconCenterX - rocketW * 0.2, y: iconCenterY + rocketH * 1.1 }, // 12
-        // 尾焰曲线 - 中
-        { x: iconCenterX, y: iconCenterY + rocketH * 0.5 }, // 13
-        { x: iconCenterX, y: iconCenterY + rocketH * 0.75 }, // 14
-        { x: iconCenterX, y: iconCenterY + rocketH * 1.0 }, // 15
-        { x: iconCenterX, y: iconCenterY + rocketH * 1.25 }, // 16
-        // 尾焰曲线 - 右
-        { x: iconCenterX + rocketW * 0.5, y: iconCenterY + rocketH * 0.5 }, // 17
-        { x: iconCenterX + rocketW * 0.6, y: iconCenterY + rocketH * 0.7 }, // 18
-        { x: iconCenterX + rocketW * 0.4, y: iconCenterY + rocketH * 0.9 }, // 19
-        { x: iconCenterX + rocketW * 0.2, y: iconCenterY + rocketH * 1.1 }, // 20
+        // 火箭尖端
+        rotate(0, -size * 1.0), // 0: 顶点
+        
+        // 火箭头部曲线
+        rotate(-size * 0.25, -size * 0.6), // 1: 头部左
+        rotate(size * 0.25, -size * 0.6), // 2: 头部右
+        
+        // 机身
+        rotate(-size * 0.3, -size * 0.2), // 3: 机身上左
+        rotate(size * 0.3, -size * 0.2), // 4: 机身上右
+        rotate(-size * 0.3, size * 0.4), // 5: 机身下左
+        rotate(size * 0.3, size * 0.4), // 6: 机身下右
+        
+        // 左尾翼（向左下延伸）
+        rotate(-size * 0.7, size * 0.7), // 7: 左翼尖端
+        rotate(-size * 0.3, size * 0.2), // 8: 左翼根部上
+        rotate(-size * 0.3, size * 0.55), // 9: 左翼根部下
+        
+        // 右尾翼（向右延伸，但因为倾斜所以看起来在下方）
+        rotate(size * 0.7, size * 0.7), // 10: 右翼尖端
+        rotate(size * 0.3, size * 0.2), // 11: 右翼根部上
+        rotate(size * 0.3, size * 0.55), // 12: 右翼根部下
+        
+        // 尾焰（从底部喷出）
+        rotate(-size * 0.15, size * 0.5), // 13: 左焰起点
+        rotate(-size * 0.25, size * 0.9), // 14: 左焰终点
+        rotate(0, size * 0.5), // 15: 中焰起点
+        rotate(0, size * 1.05), // 16: 中焰终点
+        rotate(size * 0.15, size * 0.5), // 17: 右焰起点
+        rotate(size * 0.25, size * 0.9), // 18: 右焰终点
+        
         // 舷窗
-        { x: iconCenterX, y: iconCenterY - rocketH * 0.2 }, // 21: 舷窗
+        rotate(0, -size * 0.3), // 19: 舷窗
       ];
       
-      cornerIndices = [0, 4, 8, 12, 16, 20, 21];
+      // 关键点（会更亮更大）
+      cornerIndices = [0, 7, 10, 14, 16, 18, 19];
       
       connections = [
-        // 火箭头
-        [0, 1], [0, 5],
-        // 火箭左侧
-        [1, 2], [2, 3], [3, 4],
-        // 火箭右侧
-        [5, 6], [6, 7], [7, 8],
+        // 火箭头部
+        [0, 1], [0, 2], [1, 2],
+        // 机身轮廓
+        [1, 3], [3, 5],
+        [2, 4], [4, 6],
+        [5, 6],
+        // 左尾翼
+        [8, 7], [7, 9], [9, 5],
+        // 右尾翼
+        [11, 10], [10, 12], [12, 6],
         // 尾焰
-        [4, 9], [9, 10], [10, 11], [11, 12],
-        [4, 13], [8, 13], [13, 14], [14, 15], [15, 16],
-        [8, 17], [17, 18], [18, 19], [19, 20],
+        [13, 14], [15, 16], [17, 18],
       ];
       
-      // 流动路径 - 从尾焰底部向火箭顶部流动
+      // 流动路径
       flowPaths = [
-        [12, 11, 10, 9, 4, 3, 2, 1, 0], // 左侧上升
-        [16, 15, 14, 13, 4, 3, 2, 1, 0], // 中间上升（经左）
-        [16, 15, 14, 13, 8, 7, 6, 5, 0], // 中间上升（经右）
-        [20, 19, 18, 17, 8, 7, 6, 5, 0], // 右侧上升
+        [14, 13, 5, 3, 1, 0],
+        [16, 15, 5, 3, 1, 0],
+        [16, 15, 6, 4, 2, 0],
+        [18, 17, 6, 4, 2, 0],
       ];
     } else if (iconType === 'building') {
       // 建筑/高楼 icon 🏢

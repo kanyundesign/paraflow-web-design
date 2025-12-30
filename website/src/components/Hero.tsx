@@ -159,7 +159,7 @@ export default function Hero() {
   })), []);
 
   return (
-    <section className="relative min-h-screen bg-black flex flex-col overflow-hidden">
+    <section className="relative min-h-[90vh] bg-black flex flex-col overflow-hidden">
       {/* CSS 星系背景 */}
       <div className="absolute inset-0 z-0">
         {/* 中心光晕 */}

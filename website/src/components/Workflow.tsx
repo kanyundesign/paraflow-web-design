@@ -14,6 +14,8 @@ interface WorkflowStep {
   iconType: 'link' | 'palette' | 'code';
   image?: string;
   tag: string;
+  iconOffsetY?: number;
+  iconScaleMultiplier?: number;
 }
 
 export default function Workflow() {
@@ -51,6 +53,8 @@ export default function Workflow() {
       iconType: "code",
       image: "/workflow-03.jpg",
       tag: "Develop",
+      iconOffsetY: 10,
+      iconScaleMultiplier: 0.8,
     },
   ];
 
@@ -178,6 +182,8 @@ export default function Workflow() {
                       isHovered={hoveredIndex === index}
                       staticColor="rgba(255, 255, 255, 0.15)"
                       hoverColor="rgba(0, 192, 92, 1)"
+                      iconOffsetY={step.iconOffsetY}
+                      iconScaleMultiplier={step.iconScaleMultiplier}
                     />
                   </div>
                   
