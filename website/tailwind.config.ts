@@ -59,20 +59,20 @@ const config: Config = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-  		fontFamily: {
-  			serif: [
-  				'Georgia',
-  				'Charter',
-  				'Times New Roman',
-  				'serif'
-  			],
-  			sans: [
-  				'Inter',
-  				'system-ui',
-  				'-apple-system',
-  				'sans-serif'
-  			]
-  		},
+		fontFamily: {
+			display: [
+				'Parkinsans',
+				'system-ui',
+				'-apple-system',
+				'sans-serif'
+			],
+			sans: [
+				'Inter',
+				'system-ui',
+				'-apple-system',
+				'sans-serif'
+			]
+		},
   		backgroundImage: {
   			'paraflow-gradient': 'linear-gradient(135deg, #00C05C 0%, #79F200 100%)',
   			'paraflow-gradient-dark': 'linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%)',

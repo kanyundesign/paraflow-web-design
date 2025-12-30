@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom font imports - Newsreader (类似 Tiempos 风格) */
-@import url('https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,200;6..72,300;6..72,400;6..72,500;6..72,600;6..72,700&family=Inter:wght@300;400;500;600;700&display=swap');
+/* Custom font imports - Parkinsans (展示字体) + Inter (正文字体) */
+@import url('https://fonts.googleapis.com/css2?family=Parkinsans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
   /* Paraflow 品牌色 */
@@ -37,10 +37,10 @@ body {
   overflow-x: hidden;
 }
 
-/* 新闻杂志衬线字体 - Newsreader (类似 Tiempos) */
+/* 展示字体 - Parkinsans (非衬线体) */
 .font-display {
-  font-family: 'Newsreader', Georgia, 'Times New Roman', serif;
-  font-weight: 500;
+  font-family: 'Parkinsans', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
   font-feature-settings: 'liga' 1, 'kern' 1;
 }
 
