@@ -37,9 +37,8 @@ function FeatureCard({ title, description, image, imageScale = 100, imageOffsetY
       <div className="h-px bg-white/40 flex-shrink-0" />
       
       {/* 内容 */}
-      <div className="p-5 bg-black flex-1 flex flex-col">
-        <h4 className="text-white font-semibold mb-2 group-hover:text-paraflow-green transition-colors duration-300">{title}</h4>
-        <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">{description}</p>
+      <div className="p-5 bg-black flex-1 flex flex-col justify-center">
+        <h4 className="text-white font-semibold group-hover:text-paraflow-green transition-colors duration-300">{title}</h4>
       </div>
       
       {/* 右上角箭头图标 - hover 时显示 */}
@@ -58,29 +57,29 @@ const modules = [
     description: "Design UI, define logic, and work with real data in one canvas. No handoffs. No glue code. Just shippable software.",
       cards: [
       {
-        title: "Interactive Portfolio",
-        description: "Full-stack portfolio with real-time updates and seamless authentication.",
+        title: "Lorem ipsum dolor sit amet consectetur",
+        description: "",
         image: "/feature-01-01.jpg",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Sales Lead Tracker",
-        description: "Manage your sales pipeline with visual kanban boards and insights.",
+        title: "Adipiscing elit sed do",
+        description: "",
         image: "/feature-01-02.png",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Customer Feedback",
-        description: "Gather user insights with customizable surveys and NPS tracking.",
+        title: "Eiusmod tempor incididunt ut labore",
+        description: "",
         image: "/feature-01-03.webp",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Restaurant System",
-        description: "Dual-interface system for customers and kitchen management.",
+        title: "Dolore magna aliqua",
+        description: "",
         image: "/feature-01-04.webp",
         imageScale: 120,
         imageOffsetY: 0,
@@ -94,29 +93,29 @@ const modules = [
     description: "Connect to any API, database, or service. Visualize and manipulate data with intuitive components.",
       cards: [
       {
-        title: "Real-time Dashboard",
-        description: "Live data visualization with WebSocket connections and auto-refresh.",
+        title: "Ut enim ad minim veniam quis nostrud",
+        description: "",
         image: "/feature-02-01.jpg",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "API Integration",
-        description: "Connect to REST, GraphQL, or any custom API with visual configuration.",
+        title: "Exercitation ullamco",
+        description: "",
         image: "/feature-02-02.png",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Database Explorer",
-        description: "Browse, query, and modify your data with a powerful visual interface.",
+        title: "Laboris nisi ut aliquip ex ea commodo",
+        description: "",
         image: "/feature-02-03.png",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Workflow Automation",
-        description: "Build complex data pipelines with drag-and-drop workflow editor.",
+        title: "Consequat duis aute",
+        description: "",
         image: "/feature-02-04.png",
         imageScale: 120,
         imageOffsetY: 0,
@@ -130,29 +129,29 @@ const modules = [
     description: "From prototype to production in seconds. Built-in hosting, domains, and scaling.",
       cards: [
       {
-        title: "Instant Deploy",
-        description: "Push to production with a single click. Zero configuration needed.",
+        title: "Irure dolor in reprehenderit",
+        description: "",
         image: "/feature-03-01.jpg",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Custom Domains",
-        description: "Connect your own domain with automatic SSL and DNS management.",
+        title: "In voluptate velit esse cillum dolore",
+        description: "",
         image: "/feature-03-02.png",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Analytics Built-in",
-        description: "Track user behavior, performance metrics, and business KPIs.",
+        title: "Eu fugiat nulla",
+        description: "",
         image: "/feature-03-03.jpg",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Version Control",
-        description: "Rollback, branch, and collaborate with Git-like version control.",
+        title: "Pariatur excepteur sint occaecat cupidatat",
+        description: "",
         image: "/feature-03-04.jpg",
         imageScale: 120,
         imageOffsetY: 0,
@@ -166,29 +165,29 @@ const modules = [
     description: "Empower every team member to create custom tools, automations, and interfaces without blocking engineering.",
       cards: [
       {
-        title: "Internal Tools",
-        description: "Build custom admin panels, dashboards, and internal applications rapidly.",
+        title: "Non proident sunt in culpa",
+        description: "",
         image: "/feature-04-01.jpg",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Custom Flow",
-        description: "Create automated workflows connecting your favorite tools and services.",
+        title: "Qui officia deserunt mollit anim id est laborum",
+        description: "",
         image: "/feature-04-02.png",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Team Collaboration",
-        description: "Enable cross-functional teams to contribute to app development visually.",
+        title: "Sed ut perspiciatis",
+        description: "",
         image: "/feature-04-03.jpg",
         imageScale: 120,
         imageOffsetY: 0,
       },
       {
-        title: "Self Service",
-        description: "Deploy self-service portals for customers and internal stakeholders.",
+        title: "Unde omnis iste natus error sit voluptatem",
+        description: "",
         image: "/feature-04-04.webp",
         imageScale: 120,
         imageOffsetY: 0,
@@ -388,24 +387,12 @@ export default function Features() {
                   className={`flex flex-col justify-center ${hasAnimated ? "animate-fadeInLeft" : ""}`}
                   key={`content-${activeIndex}`}
                 >
-                  {/* 标签 */}
-                  <div 
-                    className={`flex items-center gap-2 mb-6 ${hasAnimated ? "animate-fadeInUp" : ""}`}
+                  {/* 标题 - 放大字号，限制宽度避免与竖线冲突 */}
+                  <h3 
+                    className={`font-display text-4xl md:text-5xl lg:text-6xl leading-[1.2] md:leading-[1.2] lg:leading-[1.2] tracking-wide mb-6 max-w-[550px] ${hasAnimated ? "animate-fadeInUp" : ""}`}
                     style={hasAnimated ? { animationDelay: '0ms' } : undefined}
                   >
-                    <span className="text-white/40 text-sm">/</span>
-                    <span className="text-white text-sm font-mono tracking-wider">{currentModule.id}</span>
-                    <span className="text-white/40 text-sm font-mono tracking-wider">Usecase</span>
-                    <span className="text-white/40 text-sm">/</span>
-        </div>
-
-                  {/* 标题 */}
-                  <h3 
-                    className={`font-display text-3xl md:text-4xl lg:text-5xl leading-tight mb-6 ${hasAnimated ? "animate-fadeInUp" : ""}`}
-                    style={hasAnimated ? { animationDelay: '100ms' } : undefined}
-                  >
-                    <span className="text-white">{currentModule.title}</span>
-                        <br />
+                    <span className="text-white">{currentModule.title} </span>
                     <span className="text-paraflow-green">{currentModule.titleHighlight}</span>
                   </h3>
                   
@@ -431,8 +418,8 @@ export default function Features() {
                       />
                   ))}
                 </div>
-                </div>
-
+              </div>
+              
                 {/* 右侧：卡片网格 - 带左侧装饰线 */}
                 <div className="relative lg:pl-12">
                   {/* 纵向装饰线 */}
@@ -449,8 +436,7 @@ export default function Features() {
                   {currentModule.cards.map((card, i) => (
                     <div
                       key={`${activeIndex}-${i}`}
-                      className={`h-full ${hasAnimated ? "animate-fadeInUp" : ""}`}
-                      style={hasAnimated ? { animationDelay: `${300 + i * 120}ms` } : undefined}
+                      className="h-full"
                     >
                       <FeatureCard {...card} />
                     </div>
