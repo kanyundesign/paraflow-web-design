@@ -1,652 +1,315 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Layers, Palette, Sparkles, Users, ArrowUpRight } from "lucide-react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { ArrowUpRight } from "lucide-react";
 import StarBackground from "./StarBackground";
 
 interface FeatureCardProps {
   title: string;
   description: string;
-  tag: string;
-  variant?: 'dashboard' | 'chart' | 'list' | 'code' | 'chat' | 'grid' | 'form' | 'kanban';
   image?: string;
   imageScale?: number;
   imageOffsetY?: number;
-  grayscale?: boolean;
 }
 
-// 抽象 UI 组件 - Dashboard 样式
-function DashboardVisual() {
-  return (
-    <div className="w-full h-full p-3 flex flex-col gap-2">
-      {/* 顶部工具栏 */}
-      <div className="flex gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-red-400/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-        <div className="w-2 h-2 rounded-full bg-green-400/60" />
-      </div>
-      {/* 卡片网格 */}
-      <div className="flex-1 grid grid-cols-3 gap-1.5">
-        <div className="col-span-2 bg-white/5 rounded border border-white/40" />
-        <div className="bg-paraflow-green/10 rounded border border-paraflow-green/20" />
-        <div className="bg-white/5 rounded border border-white/40" />
-        <div className="bg-purple-400/10 rounded border border-purple-400/20" />
-        <div className="bg-white/5 rounded border border-white/40" />
-      </div>
-    </div>
-  );
-}
-
-// 抽象 UI 组件 - Chart 样式
-function ChartVisual() {
-  return (
-    <div className="w-full h-full p-3 flex flex-col gap-2">
-      <div className="flex gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-red-400/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-        <div className="w-2 h-2 rounded-full bg-green-400/60" />
-      </div>
-      {/* 图表区域 */}
-      <div className="flex-1 flex items-end gap-1 px-2">
-        {[40, 65, 45, 80, 55, 70, 90, 60].map((h, i) => (
-          <div 
-            key={i} 
-            className="flex-1 bg-gradient-to-t from-paraflow-green/40 to-paraflow-green/10 rounded-t border border-paraflow-green/20 border-b-0"
-            style={{ height: `${h}%` }}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// 抽象 UI 组件 - List 样式
-function ListVisual() {
-  return (
-    <div className="w-full h-full p-3 flex flex-col gap-2">
-      <div className="flex gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-red-400/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-        <div className="w-2 h-2 rounded-full bg-green-400/60" />
-      </div>
-      {/* 列表项 */}
-      <div className="flex-1 flex flex-col gap-1.5">
-        {[1,2,3,4].map(i => (
-          <div key={i} className="flex items-center gap-2 bg-white/5 rounded px-2 py-1.5 border border-white/40">
-            <div className="w-3 h-3 rounded bg-blue-400/30" />
-            <div className="flex-1 h-1.5 bg-white/20 rounded" />
-            <div className="w-8 h-1.5 bg-paraflow-green/30 rounded" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// 抽象 UI 组件 - Code 样式
-function CodeVisual() {
-  return (
-    <div className="w-full h-full p-3 flex flex-col gap-2">
-      <div className="flex gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-red-400/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-        <div className="w-2 h-2 rounded-full bg-green-400/60" />
-      </div>
-      {/* 代码行 */}
-      <div className="flex-1 flex flex-col gap-1 font-mono text-[6px]">
-        <div className="flex gap-1">
-          <span className="text-gray-600 w-3">1</span>
-          <span className="text-purple-400">const</span>
-          <span className="text-white/60">app</span>
-          <span className="text-gray-500">=</span>
-          <span className="text-paraflow-green">create</span>
-          <span className="text-gray-500">()</span>
-        </div>
-        <div className="flex gap-1">
-          <span className="text-gray-600 w-3">2</span>
-          <span className="text-purple-400">await</span>
-          <span className="text-blue-400">deploy</span>
-          <span className="text-gray-500">(</span>
-          <span className="text-orange-400">&apos;prod&apos;</span>
-          <span className="text-gray-500">)</span>
-        </div>
-        <div className="flex gap-1">
-          <span className="text-gray-600 w-3">3</span>
-          <span className="text-gray-600">// Ready ✓</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 抽象 UI 组件 - Chat 样式
-function ChatVisual() {
-  return (
-    <div className="w-full h-full p-3 flex flex-col gap-2">
-      <div className="flex gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-red-400/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-        <div className="w-2 h-2 rounded-full bg-green-400/60" />
-      </div>
-      {/* 聊天消息 */}
-      <div className="flex-1 flex flex-col gap-1.5">
-        <div className="self-start bg-white/40 rounded-lg rounded-tl-none px-2 py-1 max-w-[70%]">
-          <div className="h-1 bg-white/30 rounded w-12 mb-0.5" />
-          <div className="h-1 bg-white/20 rounded w-8" />
-        </div>
-        <div className="self-end bg-paraflow-green/20 rounded-lg rounded-tr-none px-2 py-1 max-w-[70%]">
-          <div className="h-1 bg-paraflow-green/50 rounded w-14 mb-0.5" />
-          <div className="h-1 bg-paraflow-green/30 rounded w-10" />
-        </div>
-        <div className="self-start bg-white/40 rounded-lg rounded-tl-none px-2 py-1 max-w-[70%]">
-          <div className="h-1 bg-white/30 rounded w-16" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 抽象 UI 组件 - Grid 样式
-function GridVisual() {
-  return (
-    <div className="w-full h-full p-3 flex flex-col gap-2">
-      <div className="flex gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-red-400/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-        <div className="w-2 h-2 rounded-full bg-green-400/60" />
-      </div>
-      {/* 产品网格 */}
-      <div className="flex-1 grid grid-cols-2 gap-1.5">
-        {[1,2,3,4].map(i => (
-          <div key={i} className="bg-white/5 rounded border border-white/40 flex flex-col">
-            <div className="flex-1 bg-gradient-to-br from-purple-400/10 to-blue-400/10" />
-            <div className="p-1">
-              <div className="h-1 bg-white/20 rounded w-full mb-0.5" />
-              <div className="h-1 bg-paraflow-green/30 rounded w-1/2" />
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// 抽象 UI 组件 - Form 样式
-function FormVisual() {
-  return (
-    <div className="w-full h-full p-3 flex flex-col gap-2">
-      <div className="flex gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-red-400/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-        <div className="w-2 h-2 rounded-full bg-green-400/60" />
-      </div>
-      {/* 表单字段 */}
-      <div className="flex-1 flex flex-col gap-1.5">
-        {[1,2,3].map(i => (
-          <div key={i} className="flex flex-col gap-0.5">
-            <div className="h-1 bg-white/30 rounded w-8" />
-            <div className="h-4 bg-white/5 rounded border border-white/40" />
-          </div>
-        ))}
-        <div className="mt-auto h-5 bg-paraflow-green/20 rounded border border-paraflow-green/30 flex items-center justify-center">
-          <div className="h-1.5 bg-paraflow-green/50 rounded w-8" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 抽象 UI 组件 - Kanban 样式
-function KanbanVisual() {
-  return (
-    <div className="w-full h-full p-3 flex flex-col gap-2">
-      <div className="flex gap-1.5">
-        <div className="w-2 h-2 rounded-full bg-red-400/60" />
-        <div className="w-2 h-2 rounded-full bg-yellow-400/60" />
-        <div className="w-2 h-2 rounded-full bg-green-400/60" />
-      </div>
-      {/* Kanban 列 */}
-      <div className="flex-1 flex gap-1.5">
-        {['blue', 'yellow', 'green'].map((color, i) => (
-          <div key={i} className="flex-1 flex flex-col gap-1">
-            <div className={`h-1 rounded ${color === 'blue' ? 'bg-blue-400/50' : color === 'yellow' ? 'bg-yellow-400/50' : 'bg-paraflow-green/50'}`} />
-            {[1,2].map(j => (
-              <div key={j} className="bg-white/5 rounded border border-white/40 p-1">
-                <div className="h-1 bg-white/20 rounded w-full mb-0.5" />
-                <div className="h-1 bg-white/40 rounded w-2/3" />
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-const visualComponents: Record<string, React.FC> = {
-  dashboard: DashboardVisual,
-  chart: ChartVisual,
-  list: ListVisual,
-  code: CodeVisual,
-  chat: ChatVisual,
-  grid: GridVisual,
-  form: FormVisual,
-  kanban: KanbanVisual,
-};
-
-function FeatureCard({ title, description, tag, variant = 'dashboard', image, imageScale = 100, imageOffsetY = 0, grayscale = false }: FeatureCardProps) {
-  const VisualComponent = visualComponents[variant] || DashboardVisual;
+function FeatureCard({ title, description, image, imageScale = 100, imageOffsetY = 0 }: FeatureCardProps) {
   const scaleValue = imageScale / 100;
   
   return (
-    <div className="group relative bg-black border border-white/40 rounded-2xl overflow-hidden hover:border-paraflow-green transition-all duration-500 cursor-pointer">
+    <div className="group relative h-full flex flex-col bg-black rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-lg hover:shadow-paraflow-green/10 hover:-translate-y-1 border border-white/40">
       {/* 配图 */}
-      <div className="aspect-video bg-gradient-to-br from-paraflow-green/5 via-black to-paraflow-green-light/5 overflow-hidden">
+      <div className="aspect-[4/3] bg-gray-900 overflow-hidden flex-shrink-0">
         {image ? (
           <img 
             src={image} 
             alt={title}
-            className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-105 opacity-80 ${grayscale ? 'grayscale group-hover:grayscale-0' : ''}`}
-            style={{ transform: `scale(${scaleValue}) translateY(${imageOffsetY}px)` }}
+            className="w-full h-full object-cover transition-all duration-500 grayscale group-hover:grayscale-0 group-hover:scale-105"
+            style={{ 
+              transform: `scale(${scaleValue}) translateY(${imageOffsetY}px)`,
+            }}
           />
         ) : (
-          <VisualComponent />
+          <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900" />
         )}
       </div>
       
-      {/* 内容区域 - hover 时向上移动覆盖图片 */}
-      <div className="relative bg-black transition-transform duration-500 ease-out group-hover:-translate-y-10">
-        {/* 装饰分割线 */}
-        <div className="border-t border-white/40" />
-        
-        <div className="px-4 pt-3 pb-2">
-          <div className="inline-flex items-center px-2 py-0.5 bg-white/5 border border-white/20 rounded-full text-[10px] text-white font-medium tracking-wider mb-3 group-hover:bg-paraflow-green/10 group-hover:border-paraflow-green/30 group-hover:text-paraflow-green transition-all duration-300">
-            {tag}
-          </div>
-          <h4 className="text-white text-sm font-medium group-hover:text-paraflow-green transition-colors duration-300">
-            {title}
-          </h4>
-          
-          {/* 副文案 */}
-          <p className="text-gray-400 text-xs leading-relaxed mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 line-clamp-2">
-            {description}
-          </p>
-        </div>
+      {/* 分割线 */}
+      <div className="h-px bg-white/40 flex-shrink-0" />
+      
+      {/* 内容 */}
+      <div className="p-5 bg-black flex-1 flex flex-col">
+        <h4 className="text-white font-semibold mb-2 group-hover:text-paraflow-green transition-colors duration-300">{title}</h4>
+        <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">{description}</p>
       </div>
       
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <ArrowUpRight className="w-4 h-4 text-paraflow-green" />
+      {/* 右上角箭头图标 - hover 时显示 */}
+      <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-paraflow-green flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <ArrowUpRight className="w-4 h-4 text-black" />
       </div>
     </div>
   );
 }
 
-interface FeatureModule {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  features: string[];
-  cards: FeatureCardProps[];
-}
-
-interface ModuleItemProps {
-  module: FeatureModule;
-  index: number;
-  isExpanded: boolean;
-  onClick: () => void;
-}
-
-function ModuleItem({ module, index, isExpanded, onClick }: ModuleItemProps) {
-  return (
-    <div 
-      className={`relative overflow-hidden transition-all duration-500 cursor-pointer ${
-        isExpanded ? "bg-white/[0.02]" : "hover:bg-white/[0.01]"
-      }`}
-      onClick={onClick}
-    >
-      {/* 顶部横向装饰线 - 两端渐变 */}
-      <div 
-        className="absolute top-0 left-0 right-0 h-px"
-        style={{
-          background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 10%, rgba(255,255,255,0.4) 90%, transparent 100%)'
-        }}
-      />
-      <div className={`relative px-6 lg:px-8 transition-all duration-500 ${
-          isExpanded ? "py-6" : "py-8"
-        }`}>
-        {/* 左侧竖向装饰线（移动端隐藏） */}
-        <div className="hidden md:block absolute left-[50px] lg:left-[58px] top-0 bottom-0 w-px bg-white/40" />
-        
-        {/* 中间竖向装饰线 - 在左右两列之间 */}
-        <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-white/40" />
-        
-        {/* 横向装饰线 - 主标题与副标题之间（只在展开时显示），连接左侧竖线和中间竖线 */}
-        {isExpanded && (
-          <div 
-            className="hidden lg:block absolute h-px bg-white/40"
-            style={{ 
-              left: '58px',
-              right: '50%',
-              top: index === 0 ? '280px' : index === 1 ? '315px' : index === 2 ? '285px' : '275px'
-            }}
-          >
-            {/* 装饰方块 - 左端 */}
-            <div className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 border border-white/40 bg-black z-10" />
-          </div>
-        )}
-        
-        {/* 两列布局 - 垂直居中 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* 左侧：标题 + 描述 + 标签 */}
-          <div>
-            {/* 标题行 */}
-            <div className={`flex items-baseline gap-8 transition-all duration-500 ${
-              isExpanded ? "mt-0 md:-mt-[60px] mb-6 md:mb-12" : "mt-0 mb-0"
-            }`}>
-              <span 
-                className={`font-mono text-xl sm:text-2xl md:text-3xl lg:text-4xl transition-colors duration-500 ${
-                  isExpanded 
-                    ? index === 0 ? "text-paraflow-green" : index === 1 ? "text-purple-400" : index === 2 ? "text-blue-400" : "text-rose-400"
-                    : "text-gray-700"
-                }`}
-                style={{ transform: 'translateX(-30px)' }}
-              >
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              
-              <h3 className={`font-display text-[24px] sm:text-[30px] md:text-[38px] lg:text-[46px] transition-colors duration-500 leading-tight ${
-                isExpanded ? "text-white" : "text-gray-600"
-              }`}>
-                {module.title.includes('\n') ? (
-                  <>
-                    {module.title.split('\n')[0]}
-                    <br />
-                    <span className={`transition-colors duration-500 ${
-                      isExpanded 
-                        ? index === 0 ? "text-paraflow-green" : 
-                          index === 1 ? "text-purple-400" : 
-                          index === 2 ? "text-blue-400" :
-                          "text-rose-400"
-                        : "text-gray-600"
-                    }`}>{module.title.split('\n')[1]}</span>
-                  </>
-                ) : module.title}
-              </h3>
-            </div>
-
-
-            {/* 内容区域 */}
-            <div 
-              className="grid transition-all duration-700 ease-out"
-              style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}
-            >
-              <div className="overflow-hidden">
-                <div className="flex gap-6">
-                  {/* 占位：序号宽度 */}
-                  <div className="hidden lg:block w-[50px] flex-shrink-0" />
-                  
-                  <div>
-                    <p className={`text-white/30 leading-relaxed mb-6 max-w-lg transition-all duration-500 ${
-                      isExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                    }`} style={{ transitionDelay: isExpanded ? "150ms" : "0ms", fontSize: '16px' }}>
-                      {module.description}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-3">
-                      {module.features.map((feature, i) => (
-                        <span 
-                          key={i}
-                          className={`inline-flex items-center gap-2 px-4 py-2 border border-white/30 rounded-full text-sm text-white/30 transition-all duration-500 ${
-                            isExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                          }`}
-                          style={{ transitionDelay: isExpanded ? `${250 + i * 80}ms` : "0ms" }}
-                        >
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            index === 0 ? "bg-paraflow-green" : index === 1 ? "bg-purple-400" : index === 2 ? "bg-blue-400" : "bg-rose-400"
-                          }`} />
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* 右侧：卡片（与标题顶部对齐） */}
-          <div 
-            className="grid transition-all duration-700 ease-out"
-            style={{ gridTemplateRows: isExpanded ? "1fr" : "0fr" }}
-          >
-            <div className="overflow-hidden">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {module.cards.map((card, i) => (
-                  <div
-                    key={i}
-                    className={`transition-all duration-500 ${
-                      isExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-                    }`}
-                    style={{ transitionDelay: isExpanded ? `${200 + i * 80}ms` : "0ms" }}
-                  >
-                    <FeatureCard {...card} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function Features() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const triggerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [headerVisible, setHeaderVisible] = useState(false);
-
-  const modules: FeatureModule[] = [
-    {
-      icon: <Layers className="w-6 h-6 text-paraflow-green" />,
-      title: "Build complete apps,\nfront to back",
-      description: "Build complete apps with both frontend and backend on a single canvas, connected to a production-grade database securely.",
-      features: ["Live SQL management", "Schema automation", "Enterprise-level security"],
+const modules = [
+  {
+    id: "001",
+    title: "Build complete apps,",
+    titleHighlight: "front to back.",
+    description: "Design UI, define logic, and work with real data in one canvas. No handoffs. No glue code. Just shippable software.",
       cards: [
-        { title: "Paraflow Showcase App", description: "Full-stack application with user authentication, custom roles, and advanced admin dashboards.", tag: "FRONTEND", variant: "dashboard" as const, image: "/feature-01-01.jpg", grayscale: true },
-        { title: "Sales Lead Tracker & CRM", description: "Manage your sales pipeline with automated lead scoring and interactive Kanban task boards.", tag: "FRONTEND", variant: "kanban" as const, image: "/feature-01-02.png", imageScale: 120, imageOffsetY: -5, grayscale: true },
-        { title: "Customer Feedback System", description: "Gather user insights with automated sentiment analysis and visual feedback reporting charts.", tag: "FRONTEND", variant: "chart" as const, image: "/feature-01-03.webp", grayscale: true },
-        { title: "Restaurant Order System", description: "Dual-interface system for customers and kitchen staff with real-time websocket updates.", tag: "FRONTEND", variant: "list" as const, image: "/feature-01-04.webp", imageScale: 120, grayscale: true },
+      {
+        title: "Interactive Portfolio",
+        description: "Full-stack portfolio with real-time updates and seamless authentication.",
+        image: "/feature-01-01.jpg",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Sales Lead Tracker",
+        description: "Manage your sales pipeline with visual kanban boards and insights.",
+        image: "/feature-01-02.png",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Customer Feedback",
+        description: "Gather user insights with customizable surveys and NPS tracking.",
+        image: "/feature-01-03.webp",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Restaurant System",
+        description: "Dual-interface system for customers and kitchen management.",
+        image: "/feature-01-04.webp",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
       ],
     },
     {
-      icon: <Palette className="w-6 h-6 text-purple-400" />,
-        title: "High-quality UI by default\nCustomizable when it matters",
-      description: "Create stunning UIs with a fully configurable design system that ensures consistency while enabling high-taste customization.",
-      features: ["Global token scaling", "Atomic components", "Export to Figma support"],
+    id: "002",
+    title: "Make data-driven apps",
+    titleHighlight: "without backend headaches.",
+    description: "Connect to any API, database, or service. Visualize and manipulate data with intuitive components.",
       cards: [
-        { title: "Micro E-commerce Store", description: "A polished digital storefront featuring custom branding and secure Stripe checkout flows.", tag: "FRONTEND", variant: "grid" as const, image: "/feature-02-01.jpg", grayscale: true, imageScale: 130, imageOffsetY: -20 },
-        { title: "Interactive Personal Portfolio", description: "High-performance personal site with custom scroll effects and dynamic project showcases.", tag: "FRONTEND", variant: "code" as const, image: "/feature-02-02.png", grayscale: true },
-        { title: "Product Landing Page", description: "Conversion-optimized landing page with adaptive layouts and integrated lead capture forms.", tag: "FRONTEND", variant: "form" as const, image: "/feature-02-03.png", grayscale: true },
-        { title: "IoT Hardware Control Panel", description: "Industrial monitoring dashboard for hardware states with real-time data visualization.", tag: "FRONTEND", variant: "dashboard" as const, image: "/feature-02-04.png", grayscale: true },
+      {
+        title: "Real-time Dashboard",
+        description: "Live data visualization with WebSocket connections and auto-refresh.",
+        image: "/feature-02-01.jpg",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "API Integration",
+        description: "Connect to REST, GraphQL, or any custom API with visual configuration.",
+        image: "/feature-02-02.png",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Database Explorer",
+        description: "Browse, query, and modify your data with a powerful visual interface.",
+        image: "/feature-02-03.png",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Workflow Automation",
+        description: "Build complex data pipelines with drag-and-drop workflow editor.",
+        image: "/feature-02-04.png",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
       ],
     },
     {
-      icon: <Sparkles className="w-6 h-6 text-blue-400" />,
-      title: "From realistic mockups\nto real AI apps",
-      description: "Empower every team member to create lightweight tools that boost productivity and meet specific operational needs.",
-      features: ["Internal CRM building", "Employee flow management", "One-click internal tools"],
+    id: "003",
+    title: "Ship production apps",
+    titleHighlight: "with one click.",
+    description: "From prototype to production in seconds. Built-in hosting, domains, and scaling.",
       cards: [
-        { title: "Article Auto-Illustrator", description: "AI-powered creative tool that transforms text descriptions into high-quality imagery.", tag: "FRONTEND", image: "/feature-03-01.jpg", grayscale: true },
-        { title: "Smart Customer Chatbot", description: "Context-aware support agent trained on documentation using advanced RAG techniques.", tag: "MOBILE", image: "/feature-03-02.png", grayscale: true },
-        { title: "AI Sales Coaching Assistant", description: "Context-aware support agent trained on documentation using advanced RAG techniques.", tag: "FRONTEND", image: "/feature-03-03.jpg", grayscale: true },
-        { title: "Reddit Content Analyzer", description: "Social media trend tracking tool with keyword visualization and sentiment analysis.", tag: "FRONTEND", image: "/feature-03-04.jpg", grayscale: true },
+      {
+        title: "Instant Deploy",
+        description: "Push to production with a single click. Zero configuration needed.",
+        image: "/feature-03-01.jpg",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Custom Domains",
+        description: "Connect your own domain with automatic SSL and DNS management.",
+        image: "/feature-03-02.png",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Analytics Built-in",
+        description: "Track user behavior, performance metrics, and business KPIs.",
+        image: "/feature-03-03.jpg",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Version Control",
+        description: "Rollback, branch, and collaborate with Git-like version control.",
+        image: "/feature-03-04.jpg",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
       ],
     },
     {
-      icon: <Users className="w-6 h-6 text-rose-400" />,
-      title: "Enable anyone to build\nthe tools they need",
-      description: "Empower every team member to create lightweight, customizable tools that fit how they actually work — without waiting on engineering.",
-      features: ["One-click deployment", "Auto-scaling infrastructure", "Global CDN distribution"],
+    id: "004",
+    title: "Enable anyone to build",
+    titleHighlight: "the tools they need.",
+    description: "Empower every team member to create custom tools, automations, and interfaces without blocking engineering.",
       cards: [
-        { title: "Article Auto-Illustrator", description: "AI-powered creative tool that transforms text descriptions into high-quality imagery.", tag: "FULLSTACK", image: "/feature-04-01.jpg", grayscale: true },
-        { title: "Smart Customer Chatbot", description: "Context-aware support agent trained on documentation using advanced RAG techniques.", tag: "FRONTEND", image: "/feature-04-02.png", grayscale: true },
-        { title: "AI Sales Coaching Assistant", description: "Detailed sales performance analysis with transcript scoring and actionable feedback tools.", tag: "FULLSTACK", image: "/feature-04-03.jpg", grayscale: true },
-        { title: "Reddit Content Analyzer", description: "Social media trend tracking tool with keyword visualization and sentiment analysis.", tag: "BACKEND", image: "/feature-04-04.webp", grayscale: true },
+      {
+        title: "Internal Tools",
+        description: "Build custom admin panels, dashboards, and internal applications rapidly.",
+        image: "/feature-04-01.jpg",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Custom Flow",
+        description: "Create automated workflows connecting your favorite tools and services.",
+        image: "/feature-04-02.png",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Team Collaboration",
+        description: "Enable cross-functional teams to contribute to app development visually.",
+        image: "/feature-04-03.jpg",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
+      {
+        title: "Self Service",
+        description: "Deploy self-service portals for customers and internal stakeholders.",
+        image: "/feature-04-04.webp",
+        imageScale: 120,
+        imageOffsetY: 0,
+      },
       ],
     },
   ];
 
-  // 监听标题
+export default function Features() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [headerVisible, setHeaderVisible] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isInView, setIsInView] = useState(false);
+  const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('down');
+  const [hasAnimated, setHasAnimated] = useState(false); // 追踪是否已经进行过模块切换
+  const lastScrollY = useRef(0);
+  const isAnimatingRef = useRef(false);
+
+  // 标题区域的可见性检测
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) setHeaderVisible(true);
+        if (entry.isIntersecting) {
+          setHeaderVisible(true);
+        }
       },
-      { threshold: 0.5 }
+      { threshold: 0.3 }
     );
-    const el = document.getElementById("features-header");
-    if (el) observer.observe(el);
+
+    const header = document.getElementById("features-header");
+    if (header) observer.observe(header);
+
     return () => observer.disconnect();
   }, []);
 
-  // 抽屉式展开逻辑
-  const isAnimatingRef = useRef(false);
-  const activeIndexRef = useRef(activeIndex);
-  
-  // 保持 ref 同步
+  // 滚动监听 - 基于滚动进度切换模块
   useEffect(() => {
-    activeIndexRef.current = activeIndex;
-  }, [activeIndex]);
+    const handleScroll = () => {
+      const container = scrollContainerRef.current;
+      if (!container) return;
 
-  // 滚动到指定模块（使模块内容在视口中间偏上位置）
-  const scrollToModule = (index: number) => {
-    const targetRef = triggerRefs.current[index];
-    if (targetRef) {
-      // 使用 offsetTop 获取元素相对于文档的绝对位置
-      const sectionEl = sectionRef.current;
-      if (!sectionEl) return;
+      const currentScrollY = window.scrollY;
       
-      const sectionTop = sectionEl.offsetTop;
-      const moduleOffsetTop = targetRef.offsetTop;
-      // 将模块头部定位到视口顶部偏下 80px 的位置（导航栏高度 + 一点间距）
-      const targetPosition = sectionTop + moduleOffsetTop - 80;
-      
-      window.scrollTo({
-        top: Math.max(0, targetPosition),
-        behavior: 'smooth'
-      });
-    }
-  };
+      // 追踪滚动方向
+      if (currentScrollY > lastScrollY.current) {
+        setScrollDirection('down');
+      } else if (currentScrollY < lastScrollY.current) {
+        setScrollDirection('up');
+      }
+      lastScrollY.current = currentScrollY;
 
-  // 切换模块
-  const switchModule = (direction: 'next' | 'prev') => {
-    if (isAnimatingRef.current) return;
-    
-    const currentIndex = activeIndexRef.current;
-    const newIndex = direction === 'next' 
-      ? Math.min(currentIndex + 1, 3)
-      : Math.max(currentIndex - 1, 0);
-    
-    if (newIndex === currentIndex) return;
-    
-    isAnimatingRef.current = true;
-    setActiveIndex(newIndex);
-    
-    // 延迟执行滚动，让模块完全展开后再定位（增加到 500ms 确保展开完成）
-    setTimeout(() => {
-      const targetRef = triggerRefs.current[newIndex];
-      if (targetRef) {
-        const rect = targetRef.getBoundingClientRect();
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        
-        // 自定义 offset: 01=80px, 02=160px, 03=190px, 04=220px
-        const offsets = [80, 160, 190, 220];
-        const offset = offsets[newIndex];
-        const targetPosition = scrollTop + rect.top - offset;
-        
-        window.scrollTo({
-          top: Math.max(0, targetPosition),
-          behavior: 'smooth'
-        });
-      }
-    }, 500);
-    
-    // 动画完成后解锁（1.5秒确保动画流畅完成）
-    setTimeout(() => {
-      isAnimatingRef.current = false;
-    }, 1500);
-  };
-
-  // 监听滚轮事件实现抽屉效果
-  useEffect(() => {
-    let accumulatedDelta = 0;
-    const deltaThreshold = 150; // 需要累积的滚动量才触发切换
-    let lastWheelTime = 0;
-    
-    const handleWheel = (e: WheelEvent) => {
-      // 检查是否在 Features 区域内
-      const sectionEl = sectionRef.current;
-      if (!sectionEl) return;
+      const rect = container.getBoundingClientRect();
+      const containerHeight = container.offsetHeight;
+      const viewportHeight = window.innerHeight;
       
-      const sectionRect = sectionEl.getBoundingClientRect();
-      const isInSection = sectionRect.top <= 100 && sectionRect.bottom >= window.innerHeight * 0.5;
+      // 计算容器相对于视口的位置
+      // 当容器顶部到达视口顶部时开始，当容器底部到达视口底部时结束
+      const scrollStart = -rect.top;
+      const scrollableDistance = containerHeight - viewportHeight;
+      const scrollProgress = Math.max(0, Math.min(1, scrollStart / scrollableDistance));
       
-      if (!isInSection) {
-        accumulatedDelta = 0;
-        return;
-      }
+      // 是否在可见区域（用于显示进度指示器和固定内容）
+      // 当容器顶部在视口内且容器底部在视口下方时
+      const isContainerInView = rect.top <= 0 && rect.bottom >= viewportHeight;
+      setIsInView(isContainerInView);
       
-      // 如果正在动画中，阻止滚动
-      if (isAnimatingRef.current) {
-        e.preventDefault();
-        return;
-      }
+      // 根据进度计算当前模块索引
+      const newIndex = Math.min(modules.length - 1, Math.floor(scrollProgress * modules.length));
       
-      const currentIndex = activeIndexRef.current;
-      const isAtFirst = currentIndex === 0;
-      const isAtLast = currentIndex === 3;
-      const scrollingDown = e.deltaY > 0;
-      const scrollingUp = e.deltaY < 0;
-      
-      // 在第一个模块向上滚动，或最后一个模块向下滚动时，不拦截
-      if ((isAtFirst && scrollingUp) || (isAtLast && scrollingDown)) {
-        accumulatedDelta = 0;
-        return;
-      }
-      
-      // 拦截滚动（在 Features 区域内始终拦截，通过 switchModule 控制切换）
-      e.preventDefault();
-      
-      // 重置累积值如果间隔太长
-      const now = Date.now();
-      if (now - lastWheelTime > 500) {
-        accumulatedDelta = 0;
-      }
-      lastWheelTime = now;
-      
-      // 累积滚动量
-      accumulatedDelta += e.deltaY;
-      
-      // 检查是否达到阈值（增加到 200 防止过快切换）
-      if (Math.abs(accumulatedDelta) >= 200) {
-        const direction = accumulatedDelta > 0 ? 'next' : 'prev';
-        accumulatedDelta = 0;
-        switchModule(direction);
+      if (newIndex !== activeIndex && !isAnimatingRef.current) {
+        isAnimatingRef.current = true;
+        // 只有在模块切换时才启用动画
+        if (!hasAnimated) {
+          setHasAnimated(true);
+        }
+        setActiveIndex(newIndex);
+        setTimeout(() => {
+          isAnimatingRef.current = false;
+        }, 100);
       }
     };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // 初始化
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [activeIndex]);
+
+  // 点击进度指示器时平滑滚动到对应位置
+  const scrollToModule = useCallback((index: number) => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
     
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => window.removeEventListener('wheel', handleWheel);
-  }, []);
+    const containerTop = container.offsetTop;
+    const containerHeight = container.offsetHeight;
+    const viewportHeight = window.innerHeight;
+    const scrollableDistance = containerHeight - viewportHeight;
+    
+    // 计算目标滚动位置
+    const targetScroll = containerTop + (index / modules.length) * scrollableDistance;
+    
+    window.scrollTo({
+      top: targetScroll,
+      behavior: 'smooth'
+    });
+    
+    // 点击切换时启用动画
+    if (index !== activeIndex) {
+      setHasAnimated(true);
+    }
+    setActiveIndex(index);
+  }, [activeIndex]);
+
+  const currentModule = modules[activeIndex];
 
   return (
-    <section ref={sectionRef} className="relative bg-black overflow-hidden">
+    <section ref={sectionRef} className="relative bg-black">
       {/* 星空背景 */}
       <StarBackground starCount={96} opacity={1} />
 
-      {/* 顶部横向装饰线 - 贯穿屏幕宽度，两端渐变 */}
+      {/* 顶部横向装饰线 */}
       <div 
         className="absolute top-0 left-0 right-0 h-px z-20"
         style={{
@@ -655,9 +318,9 @@ export default function Features() {
       />
 
       <div className="relative z-10 w-full max-w-[1400px] mx-auto">
-        {/* 标题区域 - 带装饰线框架 */}
+        {/* 标题区域 */}
         <div className="relative px-6 lg:px-8">
-          {/* 底部横向装饰线 - 贯穿屏幕宽度，两端渐变 */}
+          {/* 底部横向装饰线 */}
           <div 
             className="absolute bottom-0 left-1/2 -translate-x-1/2 h-px z-20"
             style={{
@@ -666,14 +329,12 @@ export default function Features() {
             }}
           />
           
-          {/* 左侧竖向装饰线 - 贯穿整个区域 */}
+          {/* 左侧竖向装饰线 */}
           <div className="absolute z-20 left-[18%] top-0 bottom-0 w-px bg-white/40 border-[0.5px] border-white/[0.02]" />
-          {/* 左下角正方形 */}
           <div className="absolute z-20 left-[18%] bottom-0 -translate-x-1/2 translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
           
-          {/* 右侧竖向装饰线 - 贯穿整个区域 */}
+          {/* 右侧竖向装饰线 */}
           <div className="absolute z-20 right-[18%] top-0 bottom-0 w-px bg-white/40" />
-          {/* 右下角正方形 */}
           <div className="absolute z-20 right-[18%] bottom-0 translate-x-1/2 translate-y-1/2 w-2 h-2 border border-white/40 bg-black" />
 
           <div 
@@ -690,109 +351,149 @@ export default function Features() {
           </div>
         </div>
 
-        {/* 桌面端：模块列表（折叠展开效果） */}
-        <div className="hidden md:block">
-          {modules.map((module, index) => (
+        {/* 模块切换区域 - 高度创建滚动空间 */}
+        <div 
+          ref={scrollContainerRef}
+          className="relative"
+          style={{ height: `${modules.length * 100}vh` }}
+        >
+          {/* Sticky 内容 - 始终可见，在容器内滚动时保持固定 */}
+          <div 
+            className="sticky top-0 h-screen flex flex-col justify-center bg-black z-30"
+          >
+            {/* 进度指示器 - 仅在 Features 板块可见时显示 */}
             <div 
-              key={index} 
-              ref={el => { triggerRefs.current[index] = el; }}
+              className={`fixed right-[5%] top-1/2 -translate-y-1/2 z-50 hidden lg:flex flex-col gap-3 transition-all duration-500 ${
+                isInView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'
+              }`}
             >
-              <ModuleItem 
-                module={module} 
-                index={index} 
-                isExpanded={activeIndex === index}
-                onClick={() => {
-                  setActiveIndex(index);
-                  // 点击时滚动到模块（依次叠加 offset）
-                  setTimeout(() => {
-                    const targetRef = triggerRefs.current[index];
-                    if (targetRef) {
-                      const rect = targetRef.getBoundingClientRect();
-                      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                      // 自定义 offset: 01=80px, 02=160px, 03=190px, 04=220px
-                      const offsets = [80, 160, 190, 220];
-                      const offset = offsets[index];
-                      const targetPosition = scrollTop + rect.top - offset;
-                      window.scrollTo({
-                        top: Math.max(0, targetPosition),
-                        behavior: 'smooth'
-                      });
-                    }
-                  }, 500);
-                }}
-              />
+              {modules.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => scrollToModule(i)}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    i === activeIndex 
+                      ? 'bg-paraflow-green scale-125' 
+                      : 'bg-white/30 hover:bg-white/50'
+                  }`}
+                />
+              ))}
             </div>
-          ))}
+
+            {/* 模块内容 */}
+            <div className="max-w-[1400px] mx-auto px-6 lg:px-8 py-8 lg:py-12 flex-1 flex items-center w-full">
+              <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                {/* 左侧：标签 + 标题 + 描述 */}
+                <div 
+                  className={`flex flex-col justify-center ${hasAnimated ? "animate-fadeInLeft" : ""}`}
+                  key={`content-${activeIndex}`}
+                >
+                  {/* 标签 */}
+                  <div 
+                    className={`flex items-center gap-2 mb-6 ${hasAnimated ? "animate-fadeInUp" : ""}`}
+                    style={hasAnimated ? { animationDelay: '0ms' } : undefined}
+                  >
+                    <span className="text-white/40 text-sm">/</span>
+                    <span className="text-white text-sm font-mono tracking-wider">{currentModule.id}</span>
+                    <span className="text-white/40 text-sm font-mono tracking-wider">Usecase</span>
+                    <span className="text-white/40 text-sm">/</span>
         </div>
 
-        {/* 移动端：瀑布流布局（无折叠效果） */}
-        <div className="md:hidden">
-          {modules.map((module, index) => (
-            <div key={index} className="relative border-t border-white/20">
-              {/* 模块头部 */}
-              <div className="px-6 pt-8 pb-6">
-                <div className="flex items-baseline gap-6 mb-4">
-                  <span className={`font-mono text-2xl ${
-                    index === 0 ? "text-paraflow-green" : 
-                    index === 1 ? "text-purple-400" : 
-                    index === 2 ? "text-blue-400" : 
-                    "text-rose-400"
-                  }`}>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  
-                  <h3 className="font-display text-2xl text-white leading-tight flex-1">
-                    {module.title.includes('\n') ? (
-                      <>
-                        {module.title.split('\n')[0]}
+                  {/* 标题 */}
+                  <h3 
+                    className={`font-display text-3xl md:text-4xl lg:text-5xl leading-tight mb-6 ${hasAnimated ? "animate-fadeInUp" : ""}`}
+                    style={hasAnimated ? { animationDelay: '100ms' } : undefined}
+                  >
+                    <span className="text-white">{currentModule.title}</span>
                         <br />
-                        <span className={
-                          index === 0 ? "text-paraflow-green" : 
-                          index === 1 ? "text-purple-400" : 
-                          index === 2 ? "text-blue-400" : 
-                          "text-rose-400"
-                        }>{module.title.split('\n')[1]}</span>
-                      </>
-                    ) : module.title}
+                    <span className="text-paraflow-green">{currentModule.titleHighlight}</span>
                   </h3>
-                </div>
-                
-                <p className="text-white/40 text-sm leading-relaxed mb-4">
-                  {module.description}
-                </p>
-                
-                <div className="flex flex-wrap gap-2">
-                  {module.features.map((feature, i) => (
-                    <span 
+                  
+                  {/* 描述 */}
+                  <p 
+                    className={`text-gray-400 text-base lg:text-lg leading-relaxed max-w-md ${hasAnimated ? "animate-fadeInUp" : ""}`}
+                    style={hasAnimated ? { animationDelay: '200ms' } : undefined}
+                  >
+                    {currentModule.description}
+                  </p>
+
+                  {/* 移动端进度指示器 */}
+                  <div className="flex gap-2 mt-8 lg:hidden">
+                    {modules.map((_, i) => (
+                      <button
                       key={i}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-white/20 rounded-full text-xs text-white/40"
-                    >
-                      <span className={`w-1 h-1 rounded-full ${
-                        index === 0 ? "bg-paraflow-green" : 
-                        index === 1 ? "bg-purple-400" : 
-                        index === 2 ? "bg-blue-400" : 
-                        "bg-rose-400"
-                      }`} />
-                      {feature}
-                    </span>
+                        onClick={() => scrollToModule(i)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          i === activeIndex 
+                            ? 'bg-paraflow-green scale-125' 
+                            : 'bg-white/30'
+                        }`}
+                      />
                   ))}
                 </div>
-              </div>
-              
-              {/* 卡片网格 */}
-              <div className="px-6 pb-8">
-                <div className="grid grid-cols-2 gap-3">
-                  {module.cards.map((card, cardIndex) => (
-                    <FeatureCard key={cardIndex} {...card} />
+                </div>
+
+                {/* 右侧：卡片网格 - 带左侧装饰线 */}
+                <div className="relative lg:pl-12">
+                  {/* 纵向装饰线 */}
+                  <div 
+                    className="hidden lg:block absolute -left-[60px] top-[5%] h-[90%] w-[1px]"
+                    style={{
+                      background: 'linear-gradient(180deg, transparent 0%, rgba(255,255,255,0.3) 10%, rgba(255,255,255,0.3) 90%, transparent 100%)'
+                    }}
+                  />
+                <div 
+                  className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                  key={`cards-${activeIndex}`}
+                >
+                  {currentModule.cards.map((card, i) => (
+                    <div
+                      key={`${activeIndex}-${i}`}
+                      className={`h-full ${hasAnimated ? "animate-fadeInUp" : ""}`}
+                      style={hasAnimated ? { animationDelay: `${300 + i * 120}ms` } : undefined}
+                    >
+                      <FeatureCard {...card} />
+                    </div>
                   ))}
+                </div>
                 </div>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-
-        <div className="h-0" />
       </div>
+
+      {/* 动画样式 */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(24px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        .animate-fadeInUp {
+          animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          opacity: 0;
+        }
+        .animate-fadeInLeft {
+          animation: fadeInLeft 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          opacity: 0;
+        }
+      `}</style>
     </section>
   );
 }

@@ -314,9 +314,10 @@ export default function Hero() {
         </h1>
 
         {/* 副文案 - 居中 */}
-        <p className="text-gray-400 text-xl md:text-2xl lg:text-3xl text-center max-w-3xl mx-auto leading-relaxed mb-8 md:mb-12">
-          Vibe coding, with product definition and real engineering built in.
-        </p>
+        <div className="text-gray-400 text-xl md:text-2xl lg:text-3xl text-center max-w-4xl mx-auto leading-relaxed mb-8 md:mb-12">
+          <p>Define. Design. Develop.</p>
+          <p className="whitespace-nowrap">Build real apps visually on an infinite canvas, no code required.</p>
+        </div>
 
         {/* 按钮 - 居中 */}
         <div className="flex items-center justify-center gap-4 mt-[50px]">

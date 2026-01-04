@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 interface ConstellationIconProps {
-  iconType: 'link' | 'palette' | 'code' | 'rocket' | 'building' | 'flowchart' | 'monitor' | 'linechart';
+  iconType: 'link' | 'palette' | 'code' | 'rocket' | 'building' | 'flowchart' | 'monitor' | 'linechart' | 'operation';
   isHovered: boolean;
   staticColor?: string;
   hoverColor?: string;
@@ -79,7 +79,7 @@ const ConstellationIcon: React.FC<ConstellationIconProps> = ({
     let iconCenterY: number;
     if (iconType === 'rocket' || iconType === 'building') {
       iconCenterY = height * 0.5;
-    } else if (iconType === 'flowchart' || iconType === 'monitor' || iconType === 'code' || iconType === 'linechart') {
+    } else if (iconType === 'flowchart' || iconType === 'monitor' || iconType === 'code' || iconType === 'linechart' || iconType === 'operation') {
       iconCenterY = height * 0.5 - 40;
     } else {
       iconCenterY = height * 0.5 - 20;
@@ -373,6 +373,67 @@ const ConstellationIcon: React.FC<ConstellationIconProps> = ({
         [0, 1], [1, 2], // 坐标轴
         [0, 3], [0, 4], // Y轴箭头
         [5, 6], [6, 7], [7, 8], // 折线
+      ];
+    } else if (iconType === 'operation') {
+      // 运营 icon - 两个叠加的圆形头像（代表团队/用户管理）
+      const headRadius = iconScale * 0.14;
+      const bodyW = iconScale * 0.28;
+      const bodyH = iconScale * 0.18;
+      
+      // 前面的人（右侧，稍大）
+      const frontOffsetX = iconScale * 0.12;
+      const frontOffsetY = iconScale * 0.05;
+      
+      // 后面的人（左侧，稍小）
+      const backOffsetX = -iconScale * 0.15;
+      const backOffsetY = -iconScale * 0.08;
+      const backScale = 0.85;
+      
+      targetPoints = [
+        // 前面的人 - 头部圆形（8个点）
+        { x: iconCenterX + frontOffsetX, y: iconCenterY + frontOffsetY - iconScale * 0.2 - headRadius }, // 0
+        { x: iconCenterX + frontOffsetX + headRadius * 0.7, y: iconCenterY + frontOffsetY - iconScale * 0.2 - headRadius * 0.7 }, // 1
+        { x: iconCenterX + frontOffsetX + headRadius, y: iconCenterY + frontOffsetY - iconScale * 0.2 }, // 2
+        { x: iconCenterX + frontOffsetX + headRadius * 0.7, y: iconCenterY + frontOffsetY - iconScale * 0.2 + headRadius * 0.7 }, // 3
+        { x: iconCenterX + frontOffsetX, y: iconCenterY + frontOffsetY - iconScale * 0.2 + headRadius }, // 4
+        { x: iconCenterX + frontOffsetX - headRadius * 0.7, y: iconCenterY + frontOffsetY - iconScale * 0.2 + headRadius * 0.7 }, // 5
+        { x: iconCenterX + frontOffsetX - headRadius, y: iconCenterY + frontOffsetY - iconScale * 0.2 }, // 6
+        { x: iconCenterX + frontOffsetX - headRadius * 0.7, y: iconCenterY + frontOffsetY - iconScale * 0.2 - headRadius * 0.7 }, // 7
+        // 前面的人 - 身体弧形
+        { x: iconCenterX + frontOffsetX - bodyW, y: iconCenterY + frontOffsetY + bodyH }, // 8
+        { x: iconCenterX + frontOffsetX - bodyW * 0.6, y: iconCenterY + frontOffsetY + bodyH * 0.2 }, // 9
+        { x: iconCenterX + frontOffsetX, y: iconCenterY + frontOffsetY }, // 10
+        { x: iconCenterX + frontOffsetX + bodyW * 0.6, y: iconCenterY + frontOffsetY + bodyH * 0.2 }, // 11
+        { x: iconCenterX + frontOffsetX + bodyW, y: iconCenterY + frontOffsetY + bodyH }, // 12
+        
+        // 后面的人 - 头部圆形（8个点，稍小）
+        { x: iconCenterX + backOffsetX, y: iconCenterY + backOffsetY - iconScale * 0.2 - headRadius * backScale }, // 13
+        { x: iconCenterX + backOffsetX + headRadius * backScale * 0.7, y: iconCenterY + backOffsetY - iconScale * 0.2 - headRadius * backScale * 0.7 }, // 14
+        { x: iconCenterX + backOffsetX + headRadius * backScale, y: iconCenterY + backOffsetY - iconScale * 0.2 }, // 15
+        { x: iconCenterX + backOffsetX + headRadius * backScale * 0.7, y: iconCenterY + backOffsetY - iconScale * 0.2 + headRadius * backScale * 0.7 }, // 16
+        { x: iconCenterX + backOffsetX, y: iconCenterY + backOffsetY - iconScale * 0.2 + headRadius * backScale }, // 17
+        { x: iconCenterX + backOffsetX - headRadius * backScale * 0.7, y: iconCenterY + backOffsetY - iconScale * 0.2 + headRadius * backScale * 0.7 }, // 18
+        { x: iconCenterX + backOffsetX - headRadius * backScale, y: iconCenterY + backOffsetY - iconScale * 0.2 }, // 19
+        { x: iconCenterX + backOffsetX - headRadius * backScale * 0.7, y: iconCenterY + backOffsetY - iconScale * 0.2 - headRadius * backScale * 0.7 }, // 20
+        // 后面的人 - 身体弧形
+        { x: iconCenterX + backOffsetX - bodyW * backScale, y: iconCenterY + backOffsetY + bodyH * backScale }, // 21
+        { x: iconCenterX + backOffsetX - bodyW * backScale * 0.6, y: iconCenterY + backOffsetY + bodyH * backScale * 0.2 }, // 22
+        { x: iconCenterX + backOffsetX, y: iconCenterY + backOffsetY }, // 23
+        { x: iconCenterX + backOffsetX + bodyW * backScale * 0.6, y: iconCenterY + backOffsetY + bodyH * backScale * 0.2 }, // 24
+        { x: iconCenterX + backOffsetX + bodyW * backScale, y: iconCenterY + backOffsetY + bodyH * backScale }, // 25
+      ];
+      
+      cornerIndices = [0, 2, 4, 6, 8, 12, 13, 15, 17, 19, 21, 25];
+      
+      connections = [
+        // 前面的人 - 头部圆形
+        [0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7], [7, 0],
+        // 前面的人 - 身体弧形
+        [8, 9], [9, 10], [10, 11], [11, 12],
+        // 后面的人 - 头部圆形
+        [13, 14], [14, 15], [15, 16], [16, 17], [17, 18], [18, 19], [19, 20], [20, 13],
+        // 后面的人 - 身体弧形
+        [21, 22], [22, 23], [23, 24], [24, 25],
       ];
     }
 

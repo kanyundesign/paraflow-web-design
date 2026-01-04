@@ -5,7 +5,7 @@ import StarBackground from "./StarBackground";
 import ConstellationIcon from "./ConstellationIcon";
 
 interface AudienceCardProps {
-  iconType: 'rocket' | 'building' | 'flowchart' | 'monitor' | 'code' | 'linechart';
+  iconType: 'rocket' | 'building' | 'flowchart' | 'monitor' | 'code' | 'linechart' | 'operation';
   title: string;
   description: string;
   index: number;
@@ -68,7 +68,13 @@ function ConstellationCard({ iconType, title, description, index, height = 160, 
             }`}
             style={titleMaxWidth ? { maxWidth: titleMaxWidth } : undefined}
           >
-            {title}
+            {title.includes('\n') ? (
+              <>
+                {title.split('\n')[0]}
+                <br />
+                {title.split('\n')[1]}
+              </>
+            ) : title}
           </h4>
           
           {/* 描述 - hover 时显示，两行 */}
@@ -101,13 +107,13 @@ export default function Audience() {
     },
     {
       iconType: "flowchart",
-      title: "PM",
+      title: "PM &\nProduct Designer",
       description: "Turn PRDs into live, testable apps. Verify user flows and business logic without waiting for engineering cycles.",
       height: 200,
     },
     {
-      iconType: "monitor",
-      title: "Product Designer",
+      iconType: "operation",
+      title: "Operation",
       description: "Design with real functional components. Ensure your vision is pixel-perfect in production, exactly as you designed it.",
       height: 200,
       titleMaxWidth: "100px",
@@ -120,15 +126,14 @@ export default function Audience() {
     },
     {
       iconType: "linechart",
-      title: "Marketing & Operation",
+      title: "Marketing",
       description: "Launch campaign tools and landing pages without blocking engineering. Own your marketing stack from design to data.",
       height: 200,
-      titleMaxWidth: "140px",
     },
   ];
 
   return (
-    <section ref={sectionRef} className="relative bg-black py-32 -mt-[30px] overflow-hidden">
+    <section ref={sectionRef} className="relative bg-black py-32 -mt-[90px] overflow-hidden">
       {/* 顶部横向装饰线 */}
       <div 
         className="absolute top-0 left-0 right-0 h-px"
